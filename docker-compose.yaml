@@ -1,0 +1,10 @@
+version: '2'
+services:
+  mongo:
+    image: mongo
+    container_name: github_analyser_db
+    command: mongod --port 27018
+    ports:
+      - '27018:27018'
+    volumes:
+      - ./data/db:/data/db
