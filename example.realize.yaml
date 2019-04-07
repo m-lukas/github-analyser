@@ -29,10 +29,6 @@ schema:
     MONGO_HOST: <host&port>
     MONGO_NAME: admin
   commands:
-    clean:
-      status: true
-    vet:
-      status: true
     fmt:
       status: true
     test:
