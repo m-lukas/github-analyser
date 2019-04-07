@@ -24,6 +24,7 @@ schema:
 - name: github-analyser
   path: /Users/m-lukas/Documents/Projects/go/src/github.com/m-lukas/github-analyser
   env:
+    DATABASE_TYPE: <mongo/dynamo>
     MONGO_USER: <user>
     MONGO_PASS: <password>
     MONGO_HOST: <host&port>
