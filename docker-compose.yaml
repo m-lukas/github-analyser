@@ -3,7 +3,7 @@ services:
   mongo:
     image: mongo
     container_name: github_analyser_db
-    command: mongod --port 27018
+    command: mongod --auth --port 27018
     ports:
       - '27018:27018'
     volumes:

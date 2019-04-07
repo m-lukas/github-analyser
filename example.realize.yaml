@@ -23,6 +23,11 @@ server:
 schema:
 - name: github-analyser
   path: /Users/m-lukas/Documents/Projects/go/src/github.com/m-lukas/github-analyser
+  env:
+    MONGO_USER: <user>
+    MONGO_PASS: <password>
+    MONGO_HOST: <host&port>
+    MONGO_NAME: admin
   commands:
     clean:
       status: true
