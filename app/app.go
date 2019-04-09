@@ -18,9 +18,14 @@ func InitRouter(apiPath string) *chi.Mux {
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 
-	router.HandleFunc(apiPath, checkAPI)
+	router.Get(apiPath,
+		func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("API is running!"))
+		},
+	)
 
 	return router
+
 }
 
 func HandleCors(h http.Handler) http.Handler {

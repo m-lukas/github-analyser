@@ -21,11 +21,13 @@ type Database struct {
 
 type DatabaseConfig struct {
 	MongoDatabaseName string
+	MongoURI          string
 }
 
 func defaultDatabaseConfig() *DatabaseConfig {
 	return &DatabaseConfig{
 		MongoDatabaseName: "core",
+		MongoURI:          getMongoURI(),
 	}
 }
 
@@ -77,7 +79,7 @@ func initMongoClient() (*mongo.Client, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(getMongoDBConfig()))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbInstance.Config.MongoURI))
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +97,7 @@ func initMongoClient() (*mongo.Client, error) {
 /*
 	Returns configurated URI string for MongoDB.
 */
-func getMongoDBConfig() (uri string) {
+func getMongoURI() (uri string) {
 	dbHost := os.Getenv("MONGO_HOST")
 	dbName := os.Getenv("MONGO_NAME")
 	dbUser := os.Getenv("MONGO_USER")
