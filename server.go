@@ -16,7 +16,7 @@ import (
 )
 
 /*
-	Server
+	Server helper structure to setup the HTTP-Server
 */
 type Server struct {
 	Router     *chi.Mux
@@ -25,7 +25,7 @@ type Server struct {
 }
 
 /*
-	ServerConfig
+	ServerConfig provides a structure for setting and transmitting the Servers config.
 */
 type ServerConfig struct {
 	Host    string
@@ -89,7 +89,6 @@ func main() {
 	server.Router = app.InitRouter(server.Config.APIPath)
 
 	handler := app.HandleCors(server.Router)
-
 	server.HTTPServer = configHTTPServer(server.Config, handler)
 
 	log.Println("Server has been configurated!")
