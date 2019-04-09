@@ -48,7 +48,7 @@ func Init() error {
 /*
 	Returns default mongo database.
 */
-func Get() (*mongo.Database, error) {
+func Get(collectionName string) (*mongo.Collection, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -57,7 +57,8 @@ func Get() (*mongo.Database, error) {
 	if err == nil {
 		client := dbInstance.MongoClient
 		config := dbInstance.Config
-		return client.Database(config.MongoDatabaseName), nil
+		db := client.Database(config.MongoDatabaseName)
+		return db.Collection(collectionName), nil
 	}
 
 	mongoClient, err := initMongoClient()
@@ -69,7 +70,8 @@ func Get() (*mongo.Database, error) {
 
 	client := dbInstance.MongoClient
 	config := dbInstance.Config
-	return client.Database(config.MongoDatabaseName), nil
+	db := client.Database(config.MongoDatabaseName)
+	return db.Collection(collectionName), nil
 }
 
 /*

@@ -27,13 +27,12 @@ func TestDatabase(t *testing.T) {
 		t.FailNow()
 	}
 
-	db, err := db.Get()
+	collection, err := db.Get("testing")
 	if err != nil {
 		log.Println(err)
 		t.Errorf("Unable to establish database connection!")
 		t.FailNow()
 	}
-	collection := db.Collection("testing")
 
 	result := struct {
 		ID    primitive.ObjectID `bson:"_id,omitempty"`
