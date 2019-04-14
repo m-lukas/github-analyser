@@ -1,0 +1,62 @@
+### GET BYTESIZE PER LANGUAGE
+
+{
+    repository(owner: "facebook", name: "react") {
+      languages(first: 50, orderBy: {field: SIZE, direction: DESC}) {
+        edges {
+          size
+          node {
+            name
+          }
+        }
+      }
+    }
+  }
+
+### GET FILES IN REPO DIRECTORY
+
+query TestQuery($branch: GitObjectID) {
+  rateLimit{
+    resetAt
+    cost
+    remaining
+  }
+  search(first: 1, type: REPOSITORY, query: "language:C") {
+    edges {
+      node {
+        ... on Repository {
+          object(expression: "master:", oid: $branch) {
+            ... on Tree {
+              entries {
+                oid
+                name
+                type
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+### GET GENERAL USER DATA
+
+query getUserData($name: String!){
+  repositoryOwner(login: $name) {
+    login
+    ... on User {
+      email
+      bio
+    }
+  }
+}
+
+curl 'https://api.github.com/graphql' \
+  -H "Authorization: bearer 71e7d3d47eb3cd435b036c6e817c8e8ae5cf7dec" \
+  -d '{
+    "query": "query($name:String!) { repositoryOwner(login:$name) { login ... on User{ email bio } } }",
+    "variables": {
+      "name": "m-lukas"
+    }
+  }'

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi"
+	"github.com/machinebox/graphql"
 
 	"github.com/joho/godotenv"
 	"github.com/m-lukas/github-analyser/app"
@@ -77,6 +79,8 @@ func init() {
 
 func main() {
 
+	testGraphQL()
+
 	server := &Server{
 		Config: defaultServerConfig(),
 	}
@@ -94,5 +98,49 @@ func main() {
 	log.Println("Server has been configurated!")
 
 	runServer(server)
+
+}
+
+type Data struct {
+	repositoryOwner RepositoryOwner
+}
+
+type RepositoryOwner struct {
+	login string
+	email string
+	bio   string
+}
+
+func testGraphQL() {
+
+	client := graphql.NewClient("https://api.github.com/graphql")
+
+	req := graphql.NewRequest(`
+		query getUserData($name: String!){
+			repositoryOwner(login: $name) {
+			login
+			... on User {
+				email
+				bio
+			}
+			}
+		}
+	`)
+
+	req.Var("name", "m-lukas")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	response := struct {
+		data Data
+	}{}
+
+	if err := client.Run(ctx, req, &response); err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("test")
+	fmt.Println(response)
 
 }
