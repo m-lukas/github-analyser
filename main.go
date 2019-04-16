@@ -55,7 +55,8 @@ func configHTTPServer(config *ServerConfig, handler http.Handler) *http.Server {
 
 func runServer(server *Server) {
 	go func() {
-		if err := server.HTTPServer.ListenAndServe(); err != nil {
+		err := server.HTTPServer.ListenAndServe()
+		if err != nil {
 			log.Fatal(err)
 		}
 	}()
@@ -80,7 +81,6 @@ func init() {
 func main() {
 
 	data, _ := graphql.GetBasicUserData("m-lukas")
-
 	fmt.Println(data)
 
 	server := &Server{

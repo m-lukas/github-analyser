@@ -8,11 +8,13 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/m-lukas/github-analyser/app"
+	"github.com/m-lukas/github-analyser/db"
+	"github.com/m-lukas/github-analyser/graphql"
+
 	"github.com/go-chi/chi"
 
 	"github.com/joho/godotenv"
-	"github.com/m-lukas/github-analyser/app"
-	"github.com/m-lukas/github-analyser/db"
 )
 
 /*
@@ -53,7 +55,8 @@ func configHTTPServer(config *ServerConfig, handler http.Handler) *http.Server {
 
 func runServer(server *Server) {
 	go func() {
-		if err := server.HTTPServer.ListenAndServe(); err != nil {
+		err := server.HTTPServer.ListenAndServe()
+		if err != nil {
 			log.Fatal(err)
 		}
 	}()
@@ -77,6 +80,9 @@ func init() {
 
 func main() {
 
+	data, _ := graphql.GetBasicUserData("m-lukas")
+	fmt.Println(data)
+
 	server := &Server{
 		Config: defaultServerConfig(),
 	}
@@ -94,5 +100,4 @@ func main() {
 	log.Println("Server has been configurated!")
 
 	runServer(server)
-
 }

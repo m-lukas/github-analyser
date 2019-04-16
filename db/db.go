@@ -53,20 +53,13 @@ func Get(collectionName string) (*mongo.Collection, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	err := dbInstance.MongoClient.Ping(ctx, readpref.Primary())
-
-	if err == nil {
-		client := dbInstance.MongoClient
-		config := dbInstance.Config
-		db := client.Database(config.MongoDatabaseName)
-		return db.Collection(collectionName), nil
-	}
-
-	mongoClient, err := initMongoClient()
 	if err != nil {
-		return nil, err
+		mongoClient, err := initMongoClient()
+		if err != nil {
+			return nil, err
+		}
+		dbInstance.MongoClient = mongoClient
 	}
-
-	dbInstance.MongoClient = mongoClient
 
 	client := dbInstance.MongoClient
 	config := dbInstance.Config
