@@ -1,0 +1,68 @@
+query ACTIVITY($name: String!){
+  	rateLimit{
+      cost
+      remaining
+    }
+    repositoryOwner(login: $name) {
+        ... on User {
+            following(first: 0){
+            	totalCount
+          	}
+          	gists(first: 0){
+            	totalCount
+          	}
+          	issues(first: 0){
+            	totalCount
+          	}
+          	organizations(first: 0){
+            	totalCount
+          	}
+          	projects(first: 0){
+            	totalCount
+          	}
+          	pullRequests(first: 0){
+            	totalCount
+          	}
+          	repositories(first: 100, orderBy: {field: UPDATED_AT, direction: DESC}){
+            	totalCount
+            	edges{
+                node{
+									createdAt
+                  ref(qualifiedName: "master"){
+                    target{
+                      ... on Commit{
+                        history(first: 100){
+                          edges{
+                            node{
+                              committedDate
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+          	}
+          	repositoriesContributedTo(first: 0){
+            	totalCount
+          	}
+          	starredRepositories(first: 0){
+            	totalCount
+          	}
+          	watching(first: 0){
+            	totalCount
+          	}
+          	commitComments(first: 0){
+            	totalCount
+          	}
+          	gistComments(first: 0){
+            	totalCount
+          	}
+          	issueComments(first: 0){
+            	totalCount
+          	}
+          	
+        }
+    }
+}

@@ -80,14 +80,17 @@ func init() {
 
 func main() {
 
-	data, _ := graphql.GetBasicUserData("m-lukas")
+	data, err := graphql.GetActivity("m-lukas")
+	if err != nil {
+		log.Fatal(err)
+	}
 	fmt.Println(data)
 
 	server := &Server{
 		Config: defaultServerConfig(),
 	}
 
-	err := db.Init()
+	err = db.Init()
 	if err != nil {
 		log.Fatal(err)
 	}
