@@ -109,7 +109,7 @@ func queryActivity(userName string) (*ActivityRaw, error) {
 
 	client := NewClient("https://api.github.com/graphql", nil)
 
-	query, err := ReadQuery("./graphql/queries/activity.gql")
+	query, err := readQuery("./graphql/queries/activity.gql")
 	if err != nil {
 		return nil, err
 	}
@@ -133,6 +133,8 @@ func queryActivity(userName string) (*ActivityRaw, error) {
 func convertActivity(activityData *ActivityRaw) *Activity {
 
 	data := activityData.RepositoryOwner
+	creationFrequenz := getCreationFrequenz(activityData)
+	commitFrequenz := getCommitFrequenz(activityData)
 
 	convertedActivity := &Activity{
 		Following:                  data.Following.TotalCount,
@@ -148,10 +150,82 @@ func convertActivity(activityData *ActivityRaw) *Activity {
 		GistComments:               data.GistComments.TotalCount,
 		IssueComments:              data.IssueComments.TotalCount,
 		Repositories:               data.Repositories.TotalCount,
-		RepositoryCreationFrequenz: 0.0,
-		CommitFrequenz:             0.0,
+		RepositoryCreationFrequenz: creationFrequenz,
+		CommitFrequenz:             commitFrequenz,
 	}
 
 	return convertedActivity
+
+}
+
+func getCreationFrequenz(activityData *ActivityRaw) float64 {
+
+	var creationDates dateSlice
+	var creationTimeDifferences []float64
+
+	repositorySlice := activityData.RepositoryOwner.Repositories.Edges
+
+	for _, repo := range repositorySlice {
+
+		creationDate := repo.Node.CreatedAt
+		creationDates = append(creationDates, creationDate)
+
+	}
+
+	creationDates = sortDatesAsc(creationDates)
+
+	for index := 1; index < len(creationDates); index++ {
+
+		creationDate := creationDates[index]
+		creationDateBefore := creationDates[index-1]
+
+		timeDiff := creationDate.Sub(creationDateBefore)
+		daysDiff := timeDiff.Hours() / 24
+
+		creationTimeDifferences = append(creationTimeDifferences, daysDiff)
+
+	}
+
+	frequenz := avg(creationTimeDifferences)
+	return frequenz
+
+}
+
+func getCommitFrequenz(activityData *ActivityRaw) float64 {
+
+	var commitDates dateSlice
+	var commitTimeDifferences []float64
+
+	repositorySlice := activityData.RepositoryOwner.Repositories.Edges
+	for _, repo := range repositorySlice {
+
+		commitSlice := repo.Node.Ref.Target.History.Edges
+
+		for _, commit := range commitSlice {
+
+			commitDate := commit.Node.CommittedDate
+			commitDates = append(commitDates, commitDate)
+
+		}
+
+	}
+
+	commitDates = sortDatesAsc(commitDates)
+
+	for index := 1; index < len(commitDates); index++ {
+
+		commitDate := commitDates[index]
+		commitDateBefore := commitDates[index-1]
+
+		timeDiff := commitDate.Sub(commitDateBefore)
+		hoursDiff := timeDiff.Hours()
+
+		commitTimeDifferences = append(commitTimeDifferences, hoursDiff)
+
+	}
+
+	frequenz := avg(commitTimeDifferences)
+
+	return frequenz
 
 }

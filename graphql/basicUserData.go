@@ -34,7 +34,7 @@ func GetBasicUserData(userName string) (*BasicUserData, error) {
 
 	client := NewClient("https://api.github.com/graphql", nil)
 
-	query, err := ReadQuery("./graphql/queries/userData.gql")
+	query, err := readQuery("./graphql/queries/userData.gql")
 	if err != nil {
 		return nil, err
 	}

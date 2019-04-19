@@ -2,7 +2,7 @@ package graphql
 
 import "io/ioutil"
 
-func ReadQuery(path string) (string, error) {
+func readQuery(path string) (string, error) {
 
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -10,5 +10,19 @@ func ReadQuery(path string) (string, error) {
 	}
 
 	return string(data), nil
+
+}
+
+func avg(slice []float64) float64 {
+
+	var sum float64
+
+	for _, value := range slice {
+
+		sum += value
+
+	}
+
+	return sum / float64(len(slice))
 
 }
