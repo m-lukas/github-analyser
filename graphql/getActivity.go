@@ -71,21 +71,20 @@ type ActivityRaw struct {
 }
 
 type Activity struct {
-	Following                  int
-	Gists                      int
-	Issues                     int
-	Organizations              int
-	Projects                   int
-	PullRequests               int
-	RepositoryContributedTo    int
-	StarredRepositories        int
-	Watching                   int
-	CommitComments             int
-	GistComments               int
-	IssueComments              int
-	Repositories               int
-	RepositoryCreationFrequenz float64
-	CommitFrequenz             float64
+	Following               int
+	Gists                   int
+	Issues                  int
+	Organizations           int
+	Projects                int
+	PullRequests            int
+	RepositoryContributedTo int
+	StarredRepositories     int
+	Watching                int
+	CommitComments          int
+	GistComments            int
+	IssueComments           int
+	Repositories            int
+	CommitFrequenz          float64
 }
 
 func GetActivity(userName string) (*Activity, error) {
@@ -119,7 +118,7 @@ func queryActivity(userName string) (*ActivityRaw, error) {
 
 	var activityData ActivityRaw
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	err = client.Run(ctx, request, &activityData)
 	if err != nil {
@@ -133,61 +132,26 @@ func queryActivity(userName string) (*ActivityRaw, error) {
 func convertActivity(activityData *ActivityRaw) *Activity {
 
 	data := activityData.RepositoryOwner
-	creationFrequenz := getCreationFrequenz(activityData)
 	commitFrequenz := getCommitFrequenz(activityData)
 
 	convertedActivity := &Activity{
-		Following:                  data.Following.TotalCount,
-		Gists:                      data.Gists.TotalCount,
-		Issues:                     data.Issues.TotalCount,
-		Organizations:              data.Organizations.TotalCount,
-		Projects:                   data.Projects.TotalCount,
-		PullRequests:               data.PullRequests.TotalCount,
-		RepositoryContributedTo:    data.RepositoriesContributedTo.TotalCount,
-		StarredRepositories:        data.StarredRepositories.TotalCount,
-		Watching:                   data.Watching.TotalCount,
-		CommitComments:             data.CommitComments.TotalCount,
-		GistComments:               data.GistComments.TotalCount,
-		IssueComments:              data.IssueComments.TotalCount,
-		Repositories:               data.Repositories.TotalCount,
-		RepositoryCreationFrequenz: creationFrequenz,
-		CommitFrequenz:             commitFrequenz,
+		Following:               data.Following.TotalCount,
+		Gists:                   data.Gists.TotalCount,
+		Issues:                  data.Issues.TotalCount,
+		Organizations:           data.Organizations.TotalCount,
+		Projects:                data.Projects.TotalCount,
+		PullRequests:            data.PullRequests.TotalCount,
+		RepositoryContributedTo: data.RepositoriesContributedTo.TotalCount,
+		StarredRepositories:     data.StarredRepositories.TotalCount,
+		Watching:                data.Watching.TotalCount,
+		CommitComments:          data.CommitComments.TotalCount,
+		GistComments:            data.GistComments.TotalCount,
+		IssueComments:           data.IssueComments.TotalCount,
+		Repositories:            data.Repositories.TotalCount,
+		CommitFrequenz:          commitFrequenz,
 	}
 
 	return convertedActivity
-
-}
-
-func getCreationFrequenz(activityData *ActivityRaw) float64 {
-
-	var creationDates dateSlice
-	var creationTimeDifferences []float64
-
-	repositorySlice := activityData.RepositoryOwner.Repositories.Edges
-
-	for _, repo := range repositorySlice {
-
-		creationDate := repo.Node.CreatedAt
-		creationDates = append(creationDates, creationDate)
-
-	}
-
-	creationDates = sortDatesAsc(creationDates)
-
-	for index := 1; index < len(creationDates); index++ {
-
-		creationDate := creationDates[index]
-		creationDateBefore := creationDates[index-1]
-
-		timeDiff := creationDate.Sub(creationDateBefore)
-		daysDiff := timeDiff.Hours() / 24
-
-		creationTimeDifferences = append(creationTimeDifferences, daysDiff)
-
-	}
-
-	frequenz := avg(creationTimeDifferences)
-	return frequenz
 
 }
 
@@ -212,7 +176,15 @@ func getCommitFrequenz(activityData *ActivityRaw) float64 {
 
 	commitDates = sortDatesAsc(commitDates)
 
-	for index := 1; index < len(commitDates); index++ {
+	var maxCheckedItems int
+
+	for index := len(commitDates) - 1; index > 0; index-- {
+
+		if maxCheckedItems >= 100 {
+			break
+		} else {
+			maxCheckedItems++
+		}
 
 		commitDate := commitDates[index]
 		commitDateBefore := commitDates[index-1]

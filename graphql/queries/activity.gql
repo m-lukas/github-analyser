@@ -23,24 +23,23 @@ query ACTIVITY($name: String!){
           	pullRequests(first: 0){
             	totalCount
           	}
-          	repositories(first: 100, orderBy: {field: CREATED_AT, direction: DESC}){
+          	repositories(first: 25, orderBy: {field: PUSHED_AT, direction: DESC}){
             	totalCount
             	edges{
                 node{
-					createdAt
-                    ref(qualifiedName: "master"){
-                        target{
-                            ... on Commit{
-                                history(first: 100){
-                                edges{
-                                    node{
-                                    committedDate
-                                    }
-                                }
-                                }
+                  ref(qualifiedName: "master"){
+                    target{
+                      ... on Commit{
+                        history(first: 25){
+                          edges{
+                            node{
+                              committedDate
                             }
+                          }
                         }
+                      }
                     }
+                  }
                 }
               }
           	}
@@ -63,6 +62,6 @@ query ACTIVITY($name: String!){
             	totalCount
           	}
           	
-        }
+          }
+       }
     }
-}
