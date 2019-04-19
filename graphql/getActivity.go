@@ -132,7 +132,7 @@ func queryActivity(userName string) (*ActivityRaw, error) {
 func convertActivity(activityData *ActivityRaw) *Activity {
 
 	data := activityData.RepositoryOwner
-	commitFrequenz := getCommitFrequenz(activityData)
+	commitFrequenz := GetCommitFrequenz(activityData)
 
 	convertedActivity := &Activity{
 		Following:               data.Following.TotalCount,
@@ -155,7 +155,7 @@ func convertActivity(activityData *ActivityRaw) *Activity {
 
 }
 
-func getCommitFrequenz(activityData *ActivityRaw) float64 {
+func GetCommitFrequenz(activityData *ActivityRaw) float64 {
 
 	var commitDates dateSlice
 	var commitTimeDifferences []float64
