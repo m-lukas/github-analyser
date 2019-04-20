@@ -83,7 +83,7 @@ func queryPopularity(userName string) (*PopularityRaw, error) {
 func convertPopularity(popularityData *PopularityRaw, userName string) *Popularity {
 
 	data := popularityData.RepositoryOwner
-	stargazers, forks := calcStargazersAndForks(popularityData, userName)
+	stargazers, forks := CalcStargazersAndForks(popularityData, userName)
 
 	convertedPopularity := &Popularity{
 		Followers:  data.Followers.TotalCount,
@@ -95,7 +95,7 @@ func convertPopularity(popularityData *PopularityRaw, userName string) *Populari
 
 }
 
-func calcStargazersAndForks(popularityData *PopularityRaw, userName string) (int, int) {
+func CalcStargazersAndForks(popularityData *PopularityRaw, userName string) (int, int) {
 
 	var stargazersSum int
 	var forksSum int
