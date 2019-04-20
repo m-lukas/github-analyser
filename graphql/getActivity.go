@@ -118,7 +118,7 @@ func queryActivity(userName string) (*ActivityRaw, error) {
 
 	var activityData ActivityRaw
 
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 12*time.Second)
 	defer cancel()
 	err = client.Run(ctx, request, &activityData)
 	if err != nil {
