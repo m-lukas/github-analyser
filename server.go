@@ -10,7 +10,6 @@ import (
 
 	"github.com/m-lukas/github-analyser/app"
 	"github.com/m-lukas/github-analyser/db"
-	"github.com/m-lukas/github-analyser/graphql"
 
 	"github.com/go-chi/chi"
 
@@ -80,17 +79,11 @@ func init() {
 
 func main() {
 
-	data, err := graphql.GetGeneralData("sindresorhus")
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(data)
-
 	server := &Server{
 		Config: defaultServerConfig(),
 	}
 
-	err = db.Init()
+	err := db.Init()
 	if err != nil {
 		log.Fatal(err)
 	}
