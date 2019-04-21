@@ -2,7 +2,6 @@ package graphql
 
 import (
 	"errors"
-	"fmt"
 	"time"
 )
 
@@ -95,24 +94,27 @@ type GeneralData struct {
 	Repositories              int
 }
 
-func GetGeneralData(userName string) (*GeneralData, error) {
+type GeneralDataResponse struct {
+	Data  *GeneralData
+	Error error
+}
+
+func GetGeneralData(userName string) GeneralDataResponse {
 
 	if userName == "" {
-		return nil, errors.New("username must not be empty!")
+		return GeneralDataResponse{Data: nil, Error: errors.New("username must not be empty!")}
 	}
 
 	var rawData GeneralDataRaw
 
 	err := query(userName, "./graphql/queries/general.gql", &rawData)
 	if err != nil {
-		return nil, err
+		return GeneralDataResponse{Data: nil, Error: err}
 	}
-
-	fmt.Println(rawData)
 
 	convertedData := convertGeneralData(&rawData)
 
-	return convertedData, nil
+	return GeneralDataResponse{Data: convertedData, Error: nil}
 
 }
 

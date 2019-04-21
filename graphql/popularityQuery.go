@@ -29,22 +29,27 @@ type Popularity struct {
 	Forks      int
 }
 
-func GetPopularity(userName string) (*Popularity, error) {
+type PopularityDataResponse struct {
+	Data  *Popularity
+	Error error
+}
+
+func GetPopularity(userName string) PopularityDataResponse {
 
 	if userName == "" {
-		return nil, errors.New("username must not be empty!")
+		return PopularityDataResponse{Data: nil, Error: errors.New("username must not be empty!")}
 	}
 
 	var popularityData PopularityRaw
 
 	err := query(userName, "./graphql/queries/popularity.gql", &popularityData)
 	if err != nil {
-		return nil, err
+		return PopularityDataResponse{Data: nil, Error: err}
 	}
 
 	convertedPopularity := convertPopularity(&popularityData, userName)
 
-	return convertedPopularity, nil
+	return PopularityDataResponse{Data: convertedPopularity, Error: nil}
 
 }
 

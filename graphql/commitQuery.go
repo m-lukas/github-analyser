@@ -33,22 +33,27 @@ type CommitData struct {
 	CommitFrequenz float64
 }
 
-func GetCommitData(userName string) (*CommitData, error) {
+type CommitDataResponse struct {
+	Data  *CommitData
+	Error error
+}
+
+func GetCommitData(userName string) CommitDataResponse {
 
 	if userName == "" {
-		return nil, errors.New("username must not be empty!")
+		return CommitDataResponse{Data: nil, Error: errors.New("username must not be empty!")}
 	}
 
 	var rawData CommitDataRaw
 
 	err := query(userName, "./graphql/queries/commit.gql", &rawData)
 	if err != nil {
-		return nil, err
+		return CommitDataResponse{Data: nil, Error: err}
 	}
 
 	convertedData := convertCommitData(&rawData)
 
-	return convertedData, nil
+	return CommitDataResponse{Data: convertedData, Error: nil}
 
 }
 
