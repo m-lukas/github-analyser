@@ -1,0 +1,64 @@
+query GENERAL($name: String!) {
+  rateLimit {
+    cost
+    remaining
+  }
+  repositoryOwner(login: $name) {
+    login
+    ... on User {
+      name
+      email
+      bio
+      company
+      location
+      avatarUrl
+      websiteUrl
+      createdAt
+      isCampusExpert
+      isDeveloperProgramMember
+      isEmployee
+      following(first: 0) {
+        totalCount
+      }
+      followers(first: 0) {
+        totalCount
+      }
+      gists(first: 0) {
+        totalCount
+      }
+      issues(first: 0) {
+        totalCount
+      }
+      organizations(first: 0) {
+        totalCount
+      }
+      projects(first: 0) {
+        totalCount
+      }
+      pullRequests(first: 0) {
+        totalCount
+      }
+      repositories(first: 0) {
+        totalCount
+      }
+      repositoriesContributedTo(first: 0) {
+        totalCount
+      }
+      starredRepositories(first: 0) {
+        totalCount
+      }
+      watching(first: 0) {
+        totalCount
+      }
+      commitComments(first: 0) {
+        totalCount
+      }
+      gistComments(first: 0) {
+        totalCount
+      }
+      issueComments(first: 0) {
+        totalCount
+      }
+    }
+  }
+}

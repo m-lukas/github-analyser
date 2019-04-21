@@ -1,7 +1,6 @@
 package graphql
 
 import (
-	"context"
 	"errors"
 	"time"
 )
@@ -93,39 +92,16 @@ func GetActivity(userName string) (*Activity, error) {
 		return nil, errors.New("username must not be empty!")
 	}
 
-	activityData, err := queryActivity(userName)
-	if err != nil {
-		return nil, err
-	}
-
-	convertedActivity := convertActivity(activityData)
-
-	return convertedActivity, nil
-
-}
-
-func queryActivity(userName string) (*ActivityRaw, error) {
-
-	client := NewClient("https://api.github.com/graphql", nil)
-
-	query, err := readQuery("./graphql/queries/activity.gql")
-	if err != nil {
-		return nil, err
-	}
-
-	request := NewRequest(query)
-	request.Var("name", userName)
-
 	var activityData ActivityRaw
 
-	ctx, cancel := context.WithTimeout(context.Background(), 12*time.Second)
-	defer cancel()
-	err = client.Run(ctx, request, &activityData)
+	err := query(userName, "./graphql/queries/activity.gql", &activityData)
 	if err != nil {
 		return nil, err
 	}
 
-	return &activityData, nil
+	convertedActivity := convertActivity(&activityData)
+
+	return convertedActivity, nil
 
 }
 

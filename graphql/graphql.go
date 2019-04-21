@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 type Client struct {
@@ -29,7 +30,7 @@ type Response struct {
 	Errors interface{}
 }
 
-func NewClient(endpoint string, httpClient *http.Client) *Client {
+func newClient(endpoint string, httpClient *http.Client) *Client {
 
 	client := &Client{
 		Endpoint:          endpoint,
@@ -46,7 +47,7 @@ func NewClient(endpoint string, httpClient *http.Client) *Client {
 
 }
 
-func NewRequest(query string) *Request {
+func newRequest(query string) *Request {
 	request := &Request{
 		Query:     query,
 		Variables: make(map[string]interface{}),
@@ -55,11 +56,11 @@ func NewRequest(query string) *Request {
 	return request
 }
 
-func (r *Request) Var(key string, value interface{}) {
+func (r *Request) variable(key string, value interface{}) {
 	r.Variables[key] = value
 }
 
-func (c *Client) Run(ctx context.Context, request *Request, responseData interface{}) error {
+func (c *Client) run(ctx context.Context, request *Request, responseData interface{}) error {
 
 	if request == nil {
 		return errors.New("Request object must not be nil!")
@@ -117,6 +118,29 @@ func (c *Client) Run(ctx context.Context, request *Request, responseData interfa
 	}
 
 	fmt.Println("Successfully retrieved and converted GraphQL response!")
+	return nil
+
+}
+
+func query(userName string, query string, object interface{}) error {
+
+	client := newClient("https://api.github.com/graphql", nil)
+
+	query, err := readQuery(query)
+	if err != nil {
+		return err
+	}
+
+	request := newRequest(query)
+	request.variable("name", userName)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 12*time.Second)
+	defer cancel()
+	err = client.run(ctx, request, object)
+	if err != nil {
+		return err
+	}
+
 	return nil
 
 }

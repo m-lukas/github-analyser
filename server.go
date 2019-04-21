@@ -80,7 +80,7 @@ func init() {
 
 func main() {
 
-	data, err := graphql.GetPopularity("sindresorhus")
+	data, err := graphql.GetGeneralData("sindresorhus")
 	if err != nil {
 		log.Fatal(err)
 	}

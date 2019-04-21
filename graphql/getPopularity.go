@@ -1,10 +1,8 @@
 package graphql
 
 import (
-	"context"
 	"errors"
 	"strings"
-	"time"
 )
 
 type PopularityRaw struct {
@@ -44,39 +42,16 @@ func GetPopularity(userName string) (*Popularity, error) {
 		return nil, errors.New("username must not be empty!")
 	}
 
-	popularityData, err := queryPopularity(userName)
-	if err != nil {
-		return nil, err
-	}
-
-	convertedPopularity := convertPopularity(popularityData, userName)
-
-	return convertedPopularity, nil
-
-}
-
-func queryPopularity(userName string) (*PopularityRaw, error) {
-
-	client := NewClient("https://api.github.com/graphql", nil)
-
-	query, err := readQuery("./graphql/queries/popularity.gql")
-	if err != nil {
-		return nil, err
-	}
-
-	request := NewRequest(query)
-	request.Var("name", userName)
-
 	var popularityData PopularityRaw
 
-	ctx, cancel := context.WithTimeout(context.Background(), 12*time.Second)
-	defer cancel()
-	err = client.Run(ctx, request, &popularityData)
+	err := query(userName, "./graphql/queries/popularity.gql", &popularityData)
 	if err != nil {
 		return nil, err
 	}
 
-	return &popularityData, nil
+	convertedPopularity := convertPopularity(&popularityData, userName)
+
+	return convertedPopularity, nil
 
 }
 
