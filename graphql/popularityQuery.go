@@ -6,14 +6,8 @@ import (
 )
 
 type PopularityRaw struct {
-	RateLimit struct {
-		Cost      int
-		Remaining int
-	}
+	RateLimit       rateLimit
 	RepositoryOwner struct {
-		Followers struct {
-			TotalCount int
-		}
 		Repositories struct {
 			Edges []struct {
 				Node struct {
@@ -31,7 +25,6 @@ type PopularityRaw struct {
 }
 
 type Popularity struct {
-	Followers  int
 	Stargazers int
 	Forks      int
 }
@@ -57,11 +50,9 @@ func GetPopularity(userName string) (*Popularity, error) {
 
 func convertPopularity(popularityData *PopularityRaw, userName string) *Popularity {
 
-	data := popularityData.RepositoryOwner
 	stargazers, forks := CalcStargazersAndForks(popularityData, userName)
 
 	convertedPopularity := &Popularity{
-		Followers:  data.Followers.TotalCount,
 		Stargazers: stargazers,
 		Forks:      forks,
 	}
