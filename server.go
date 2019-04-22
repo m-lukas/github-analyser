@@ -80,20 +80,20 @@ func init() {
 
 func main() {
 
-	data, err := controller.QueryUser("m-lukas")
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(data)
-
 	server := &Server{
 		Config: defaultServerConfig(),
 	}
 
-	err = db.Init()
+	err := db.Init()
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	data, err := controller.GetUser("m-lukas")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(data)
 
 	server.Router = app.InitRouter(server.Config.APIPath)
 

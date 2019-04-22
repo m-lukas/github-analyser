@@ -2,13 +2,32 @@ package controller
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/m-lukas/github-analyser/db"
 	"github.com/m-lukas/github-analyser/graphql"
 )
 
-func QueryUser(userName string) (*db.User, error) {
+func GetUser(userName string) (*db.User, error) {
+
+	user, err := queryUser(userName)
+	if err != nil {
+		return nil, err
+	}
+
+	go func(user *db.User) {
+		err = db.CacheUser(user)
+		if err != nil {
+			log.Println(err)
+		}
+	}(user)
+
+	return user, nil
+
+}
+
+func queryUser(userName string) (*db.User, error) {
 
 	generalChannel := make(chan graphql.GeneralDataResponse)
 	commitChannel := make(chan graphql.CommitDataResponse)
