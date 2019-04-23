@@ -32,5 +32,7 @@ type User struct {
 	CommitFrequenz            float64   `bson:"commit_frequenz"`
 	Stargazers                int       `bson:"stargazers"`
 	Forks                     int       `bson:"forks"`
+	ActivityScore             float64   `bson:"activity_score"`
+	PopularityScorefloat64    float64   `bson:"popularity_score"`
 	UpdatedAt                 time.Time `bson:"updated_at"`
 }

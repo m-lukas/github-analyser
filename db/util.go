@@ -2,31 +2,21 @@ package db
 
 import (
 	"context"
-	"log"
+	"errors"
 
+	"go.mongodb.org/mongo-driver/bson/primitive"
+
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-
-	"github.com/globalsign/mgo/bson"
 )
 
-func CacheUser(user *User) error {
+func UpdateAll(filter []primitive.E, document interface{}, collection *mongo.Collection) error {
 
-	collection, err := Get("users")
-	if err != nil {
-		return err
+	if len(filter) == 0 {
+		return errors.New("filter must not be empty!")
 	}
 
-	dbUser, err := FindUser(user.Login, collection)
-	if err != nil {
-		log.Println(err)
-	}
-	if dbUser != nil {
-
-		log.Println("db document exists")
-
-	}
-
-	err = Insert(user, collection)
+	_, err := collection.UpdateOne(context.Background(), filter, bson.M{"$set": document})
 	if err != nil {
 		return err
 	}
@@ -48,18 +38,13 @@ func Insert(document interface{}, collection *mongo.Collection) error {
 
 func FindUser(login string, collection *mongo.Collection) (*User, error) {
 
-	collection, err := Get("users")
-	if err != nil {
-		return nil, err
-	}
-
 	result := collection.FindOne(context.Background(), bson.M{"login": login})
 	if result.Err() != nil {
 		return nil, result.Err()
 	}
 
 	user := &User{}
-	err = result.Decode(user)
+	err := result.Decode(user)
 	if err != nil {
 		return nil, err
 	}
