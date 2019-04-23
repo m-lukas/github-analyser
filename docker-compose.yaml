@@ -1,10 +1,19 @@
 version: '2'
 services:
+
+  redis:
+    image: redis
+    container_name: gh_analyser_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/redis:/data/redis
+
   mongo:
     image: mongo
-    container_name: github_analyser_db
-    command: mongod --auth --port 27018
+    container_name: github_analyser_mongo
+    command: mongod --port 27018
     ports:
       - '27018:27018'
     volumes:
-      - ./data/db:/data/db
+      - ./data/mongo:/data/db

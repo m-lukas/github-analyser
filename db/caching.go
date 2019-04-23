@@ -4,7 +4,7 @@ import "go.mongodb.org/mongo-driver/bson"
 
 func CacheUser(user *User) error {
 
-	collection, err := Get("users")
+	collection, err := Get().GetMongo("users")
 	if err != nil {
 		return err
 	}

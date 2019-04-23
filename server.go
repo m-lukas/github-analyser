@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/m-lukas/github-analyser/app"
-	"github.com/m-lukas/github-analyser/controller"
 	"github.com/m-lukas/github-analyser/db"
 
 	"github.com/go-chi/chi"
@@ -89,11 +88,19 @@ func main() {
 		log.Fatal(err)
 	}
 
-	data, err := controller.GetUser("m-lukas")
+	redisClient, err := db.Get().GetRedis()
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(data)
+	db.ExampleClient(redisClient)
+
+	/*
+		data, err := controller.GetUser("m-lukas")
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(data)
+	*/
 
 	server.Router = app.InitRouter(server.Config.APIPath)
 

@@ -7,15 +7,17 @@ import (
 	"os"
 	"time"
 
+	"github.com/go-redis/redis"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-var dbInstance *Database
+var dbRoot *DatabaseRoot
 
-type Database struct {
+type DatabaseRoot struct {
 	MongoClient *mongo.Client
+	RedisClient *redis.Client
 	Config      *DatabaseConfig
 }
 
@@ -31,61 +33,102 @@ func defaultDatabaseConfig() *DatabaseConfig {
 	}
 }
 
+func ExampleClient(client *redis.Client) {
+	err := client.Set("key", "value", 0).Err()
+	if err != nil {
+		panic(err)
+	}
+
+	val, err := client.Get("key").Result()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("key", val)
+
+	val2, err := client.Get("key2").Result()
+	if err == redis.Nil {
+		fmt.Println("key2 does not exist")
+	} else if err != nil {
+		panic(err)
+	} else {
+		fmt.Println("key2", val2)
+	}
+	// Output: key value
+	// key2 does not exist
+}
+
 func Init() error {
-	dbInstance = &Database{
+	var err error
+
+	dbRoot = &DatabaseRoot{
 		Config: defaultDatabaseConfig(),
 	}
 
-	mongoClient, err := initMongoClient()
+	err = dbRoot.initMongoClient()
 	if err != nil {
 		return err
 	}
 
-	dbInstance.MongoClient = mongoClient
+	err = dbRoot.initRedisClient()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
-/*
-	Returns default mongo database.
-*/
-func Get(collectionName string) (*mongo.Collection, error) {
+func Get() *DatabaseRoot {
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	err := dbInstance.MongoClient.Ping(ctx, readpref.Primary())
-	if err != nil {
-		mongoClient, err := initMongoClient()
+	if dbRoot == nil {
+		err := Init()
 		if err != nil {
-			return nil, err
+			log.Println(err)
 		}
-		dbInstance.MongoClient = mongoClient
 	}
+	return dbRoot
 
-	client := dbInstance.MongoClient
-	config := dbInstance.Config
-	db := client.Database(config.MongoDatabaseName)
-	return db.Collection(collectionName), nil
 }
 
 /*
 	Initializes the mongoDB Client to access databases and collections.
 */
-func initMongoClient() (*mongo.Client, error) {
+func (root *DatabaseRoot) initMongoClient() error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbInstance.Config.MongoURI))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(root.Config.MongoURI))
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	err = client.Ping(ctx, readpref.Primary())
 	if err != nil {
-		return nil, err
+		return err
 	}
 
+	root.MongoClient = client
 	log.Println("Initialized mongo client!")
-	return client, err
+
+	return nil
+}
+
+func (root *DatabaseRoot) initRedisClient() error {
+
+	client := redis.NewClient(&redis.Options{
+		Addr:     getRedisURI(),
+		Password: "",
+		DB:       0,
+	})
+
+	_, err := client.Ping().Result()
+	if err != nil {
+		return err
+	}
+
+	root.RedisClient = client
+	log.Println("Initialized redis client!")
+
+	return nil
 
 }
 
@@ -99,4 +142,9 @@ func getMongoURI() (uri string) {
 	dbPass := os.Getenv("MONGO_PASS")
 
 	return fmt.Sprintf(`mongodb://%s:%s@%s/%s`, dbUser, dbPass, dbHost, dbName)
+}
+
+func getRedisURI() (uri string) {
+	dbHost := os.Getenv("REDIS_HOST")
+	return dbHost
 }
