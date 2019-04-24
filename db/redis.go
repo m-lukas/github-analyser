@@ -34,18 +34,3 @@ func RedisGet(client *redis.Client, key string) (interface{}, error) {
 	}
 
 }
-
-func RedisGetIfNil(client *redis.Client, key string) (interface{}, error) {
-
-	value, err := client.Get(key).Result()
-
-	if err == redis.Nil {
-		RedisInsert(client, map[string]interface{}{key: 0})
-		return 0, nil
-	} else if err != nil {
-		return nil, err
-	} else {
-		return value, nil
-	}
-
-}
