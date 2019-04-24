@@ -1,20 +1,51 @@
 package db
 
-import "github.com/go-redis/redis"
+import (
+	"errors"
 
-func (root *DatabaseRoot) GetRedis() (*redis.Client, error) {
+	"github.com/go-redis/redis"
+)
 
-	client := root.RedisClient
+func RedisInsert(client *redis.Client, pairs map[string]interface{}) error {
 
-	_, err := client.Ping().Result()
-	if err != nil {
+	for key, value := range pairs {
 
-		err = root.initRedisClient()
+		err := client.Set(key, value, 0).Err()
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 	}
 
-	return client, nil
+	return nil
+
+}
+
+func RedisGet(client *redis.Client, key string) (interface{}, error) {
+
+	value, err := client.Get(key).Result()
+
+	if err == redis.Nil {
+		return nil, errors.New("key does not exist!")
+	} else if err != nil {
+		return nil, err
+	} else {
+		return value, nil
+	}
+
+}
+
+func RedisGetIfNil(client *redis.Client, key string) (interface{}, error) {
+
+	value, err := client.Get(key).Result()
+
+	if err == redis.Nil {
+		RedisInsert(client, map[string]interface{}{key: 0})
+		return 0, nil
+	} else if err != nil {
+		return nil, err
+	} else {
+		return value, nil
+	}
+
 }

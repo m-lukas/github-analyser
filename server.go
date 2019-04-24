@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/go-redis/redis"
 	"github.com/m-lukas/github-analyser/app"
 	"github.com/m-lukas/github-analyser/db"
 
@@ -88,11 +89,17 @@ func main() {
 		log.Fatal(err)
 	}
 
-	redisClient, err := db.Get().GetRedis()
+	redisDB, err := db.Get(db.DB_REDIS)
 	if err != nil {
 		log.Fatal(err)
 	}
-	db.ExampleClient(redisClient)
+
+	client, _ := redisDB.(*redis.Client)
+	val, err := db.RedisGet(client, "key2")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(val)
 
 	/*
 		data, err := controller.GetUser("m-lukas")

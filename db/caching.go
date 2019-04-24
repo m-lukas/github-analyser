@@ -1,13 +1,25 @@
 package db
 
-import "go.mongodb.org/mongo-driver/bson"
+import (
+	"errors"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+)
 
 func CacheUser(user *User) error {
 
-	collection, err := Get().GetMongo("users")
+	db, err := Get(DB_MONGO)
 	if err != nil {
 		return err
 	}
+
+	mongo, ok := db.(*mongo.Database)
+	if ok != true {
+		return errors.New("type conversion of database failed!")
+	}
+
+	collection := mongo.Collection("users")
 
 	dbUser, err := FindUser(user.Login, collection)
 	if dbUser != nil {

@@ -3,10 +3,8 @@ package db
 import (
 	"context"
 	"errors"
-	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -15,23 +13,6 @@ import (
 /*
 	Returns default mongo database.
 */
-func (root *DatabaseRoot) GetMongo(collectionName string) (*mongo.Collection, error) {
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	err := root.MongoClient.Ping(ctx, readpref.Primary())
-	if err != nil {
-		err := root.initMongoClient()
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	client := root.MongoClient
-	config := root.Config
-	db := client.Database(config.MongoDatabaseName)
-	return db.Collection(collectionName), nil
-}
 
 func UpdateAll(filter []primitive.E, document interface{}, collection *mongo.Collection) error {
 

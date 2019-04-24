@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -11,6 +12,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
+)
+
+const (
+	DB_MONGO = "DB_MONGO"
+	DB_REDIS = "DB_REDIS"
 )
 
 var dbRoot *DatabaseRoot
@@ -33,30 +39,6 @@ func defaultDatabaseConfig() *DatabaseConfig {
 	}
 }
 
-func ExampleClient(client *redis.Client) {
-	err := client.Set("key", "value", 0).Err()
-	if err != nil {
-		panic(err)
-	}
-
-	val, err := client.Get("key").Result()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("key", val)
-
-	val2, err := client.Get("key2").Result()
-	if err == redis.Nil {
-		fmt.Println("key2 does not exist")
-	} else if err != nil {
-		panic(err)
-	} else {
-		fmt.Println("key2", val2)
-	}
-	// Output: key value
-	// key2 does not exist
-}
-
 func Init() error {
 	var err error
 
@@ -77,16 +59,69 @@ func Init() error {
 	return nil
 }
 
-func Get() *DatabaseRoot {
+func Get(dbType string) (interface{}, error) {
+
+	var err error
 
 	if dbRoot == nil {
-		err := Init()
+		err = Init()
 		if err != nil {
 			log.Println(err)
 		}
 	}
-	return dbRoot
 
+	switch dbType {
+	case DB_MONGO:
+		db, err := dbRoot.getMongo()
+		if err != nil {
+			return nil, err
+		}
+		return db, err
+	case DB_REDIS:
+		db, err := dbRoot.getRedis()
+		if err != nil {
+			return nil, err
+		}
+		return db, err
+	default:
+		return nil, errors.New("database does not exist!")
+	}
+
+}
+
+func (root *DatabaseRoot) getMongo() (*mongo.Database, error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	err := root.MongoClient.Ping(ctx, readpref.Primary())
+	if err != nil {
+		err := root.initMongoClient()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	client := root.MongoClient
+	config := root.Config
+	db := client.Database(config.MongoDatabaseName)
+	return db, nil
+}
+
+func (root *DatabaseRoot) getRedis() (*redis.Client, error) {
+
+	client := root.RedisClient
+
+	_, err := client.Ping().Result()
+	if err != nil {
+
+		err = root.initRedisClient()
+		if err != nil {
+			return nil, err
+		}
+
+	}
+
+	return client, nil
 }
 
 /*
