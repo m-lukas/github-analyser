@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -12,11 +11,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
-)
-
-const (
-	DB_MONGO = "DB_MONGO"
-	DB_REDIS = "DB_REDIS"
 )
 
 var dbRoot *DatabaseRoot
@@ -59,41 +53,29 @@ func Init() error {
 	return nil
 }
 
-func Get(dbType string) (interface{}, error) {
+func getRoot() (*DatabaseRoot, error) {
 
 	var err error
 
-	if dbRoot == nil {
-		err = Init()
-		if err != nil {
-			log.Println(err)
-		}
+	err = checkDbRoot()
+	if err != nil {
+		return nil, err
 	}
 
-	switch dbType {
-	case DB_MONGO:
-		db, err := dbRoot.getMongo()
-		if err != nil {
-			return nil, err
-		}
-		return db, err
-	case DB_REDIS:
-		db, err := dbRoot.getRedis()
-		if err != nil {
-			return nil, err
-		}
-		return db, err
-	default:
-		return nil, errors.New("database does not exist!")
-	}
+	return dbRoot, nil
 
 }
 
-func (root *DatabaseRoot) getMongo() (*mongo.Database, error) {
+func GetMongo() (*mongo.Database, error) {
+
+	root, err := getRoot()
+	if err != nil {
+		return nil, err
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	err := root.MongoClient.Ping(ctx, readpref.Primary())
+	err = root.MongoClient.Ping(ctx, readpref.Primary())
 	if err != nil {
 		err := root.initMongoClient()
 		if err != nil {
@@ -107,11 +89,15 @@ func (root *DatabaseRoot) getMongo() (*mongo.Database, error) {
 	return db, nil
 }
 
-func (root *DatabaseRoot) getRedis() (*redis.Client, error) {
+func GetRedis() (*redis.Client, error) {
+
+	root, err := getRoot()
+	if err != nil {
+		return nil, err
+	}
 
 	client := root.RedisClient
-
-	_, err := client.Ping().Result()
+	_, err = client.Ping().Result()
 	if err != nil {
 
 		err = root.initRedisClient()
@@ -165,6 +151,18 @@ func (root *DatabaseRoot) initRedisClient() error {
 
 	return nil
 
+}
+
+func checkDbRoot() error {
+
+	if dbRoot == nil {
+		err := Init()
+		if err != nil {
+			log.Println(err)
+		}
+	}
+
+	return nil
 }
 
 /*

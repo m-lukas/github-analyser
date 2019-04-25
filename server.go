@@ -8,7 +8,6 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/go-redis/redis"
 	"github.com/m-lukas/github-analyser/app"
 	"github.com/m-lukas/github-analyser/db"
 
@@ -89,13 +88,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	redisDB, err := db.Get(db.DB_REDIS)
+	redisClient, err := db.GetRedis()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	client, _ := redisDB.(*redis.Client)
-	val, err := db.RedisGet(client, "key2")
+	val, err := db.RedisGet(redisClient, "key2")
 	if err != nil {
 		log.Fatal(err)
 	}
