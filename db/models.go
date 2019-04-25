@@ -36,3 +36,23 @@ type User struct {
 	PopularityScorefloat64    float64   `bson:"popularity_score"`
 	UpdatedAt                 time.Time `bson:"updated_at"`
 }
+
+type ScoreParams struct {
+	FollowingK      float64
+	FollowersK      float64
+	GistsK          float64
+	IssuesK         float64
+	OrganizationsK  float64
+	ProjectsK       float64
+	PullRequestsK   float64
+	ContributionsK  float64
+	StarredK        float64
+	Watchingk       float64
+	CommitCommentsK float64
+	GistCommentsK   float64
+	IssueCommentsK  float64
+	ReposK          float64
+	CommitFrequenzK float64
+	StargazersK     float64
+	ForksK          float64
+}

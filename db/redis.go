@@ -2,6 +2,8 @@ package db
 
 import (
 	"errors"
+	"log"
+	"strconv"
 
 	"github.com/go-redis/redis"
 )
@@ -32,5 +34,30 @@ func RedisGet(client *redis.Client, key string) (interface{}, error) {
 	} else {
 		return value, nil
 	}
+
+}
+
+//TODO: use RedisGet with error wrapper
+func GetScoreParam(client *redis.Client, key string, field string) float64 {
+
+	value, err := client.HGet(key, field).Result()
+
+	if err == redis.Nil {
+		err = client.HSet(key, field, 1.0).Err()
+		if err != nil {
+			log.Fatal(err)
+		}
+		return 1.0
+	} else if err != nil {
+		log.Fatal(err)
+	} else {
+		float, err := strconv.ParseFloat(value, 64)
+		if err != nil {
+			log.Fatal("false field type in redis hash!")
+		}
+		return float
+	}
+
+	return 1.0
 
 }

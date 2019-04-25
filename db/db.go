@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -19,18 +20,12 @@ type DatabaseRoot struct {
 	MongoClient *mongo.Client
 	RedisClient *redis.Client
 	Config      *DatabaseConfig
+	ScoreConfig *ScoreParams
 }
 
 type DatabaseConfig struct {
 	MongoDatabaseName string
 	MongoURI          string
-}
-
-func defaultDatabaseConfig() *DatabaseConfig {
-	return &DatabaseConfig{
-		MongoDatabaseName: "core",
-		MongoURI:          getMongoURI(),
-	}
 }
 
 func Init() error {
@@ -50,20 +45,14 @@ func Init() error {
 		return err
 	}
 
-	return nil
-}
-
-func getRoot() (*DatabaseRoot, error) {
-
-	var err error
-
-	err = checkDbRoot()
+	err = dbRoot.initScoreConfig()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return dbRoot, nil
+	fmt.Println(dbRoot.ScoreConfig)
 
+	return nil
 }
 
 func GetMongo() (*mongo.Database, error) {
@@ -150,6 +139,82 @@ func (root *DatabaseRoot) initRedisClient() error {
 	log.Println("Initialized redis client!")
 
 	return nil
+
+}
+
+func (root *DatabaseRoot) initScoreConfig() error {
+
+	if root.RedisClient == nil {
+		return errors.New("redis client not initialized!")
+	}
+
+	redisClient, err := GetRedis()
+	if err != nil {
+		return err
+	}
+
+	followingK := GetScoreParam(redisClient, "following", "k")
+	followersK := GetScoreParam(redisClient, "followers", "k")
+	gistsK := GetScoreParam(redisClient, "gists", "k")
+	issuesK := GetScoreParam(redisClient, "issues", "k")
+	organizationsK := GetScoreParam(redisClient, "organizations", "k")
+	projectsK := GetScoreParam(redisClient, "projects", "k")
+	pullRequestsK := GetScoreParam(redisClient, "pullr_equests", "k")
+	contributionsK := GetScoreParam(redisClient, "contributions", "k")
+	starredK := GetScoreParam(redisClient, "starred", "k")
+	watchingk := GetScoreParam(redisClient, "watching", "k")
+	commitCommentsK := GetScoreParam(redisClient, "commit_comments", "k")
+	gistCommentsK := GetScoreParam(redisClient, "gist_comments", "k")
+	issueCommentsK := GetScoreParam(redisClient, "issue_comments", "k")
+	reposK := GetScoreParam(redisClient, "repos", "k")
+	commitFrequenzK := GetScoreParam(redisClient, "commit_frequenz", "k")
+	stargazersK := GetScoreParam(redisClient, "stargazers", "k")
+	forksK := GetScoreParam(redisClient, "forks", "k")
+
+	scoreConfig := &ScoreParams{
+		FollowingK:      followingK,
+		FollowersK:      followersK,
+		GistsK:          gistsK,
+		IssuesK:         issuesK,
+		OrganizationsK:  organizationsK,
+		ProjectsK:       projectsK,
+		PullRequestsK:   pullRequestsK,
+		ContributionsK:  contributionsK,
+		StarredK:        starredK,
+		Watchingk:       watchingk,
+		CommitCommentsK: commitCommentsK,
+		GistCommentsK:   gistCommentsK,
+		IssueCommentsK:  issueCommentsK,
+		ReposK:          reposK,
+		CommitFrequenzK: commitFrequenzK,
+		StargazersK:     stargazersK,
+		ForksK:          forksK,
+	}
+
+	root.ScoreConfig = scoreConfig
+	log.Println("Initialized score config!")
+
+	return nil
+
+}
+
+func defaultDatabaseConfig() *DatabaseConfig {
+	return &DatabaseConfig{
+		MongoDatabaseName: "core",
+		MongoURI:          getMongoURI(),
+	}
+}
+
+func getRoot() (*DatabaseRoot, error) {
+
+	var err error
+
+	err = checkDbRoot()
+	if err != nil {
+		return nil, err
+	}
+
+	return dbRoot, nil
 
 }
 
