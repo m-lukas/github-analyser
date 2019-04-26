@@ -50,8 +50,6 @@ func Init() error {
 		return err
 	}
 
-	fmt.Println(dbRoot.ScoreConfig)
-
 	return nil
 }
 
@@ -97,6 +95,24 @@ func GetRedis() (*redis.Client, error) {
 	}
 
 	return client, nil
+}
+
+func GetScoreConfig() (*ScoreParams, error) {
+
+	root, err := getRoot()
+	if err != nil {
+		return nil, err
+	}
+
+	if root.ScoreConfig == nil {
+		err := root.initScoreConfig()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return root.ScoreConfig, nil
+
 }
 
 /*
@@ -154,41 +170,75 @@ func (root *DatabaseRoot) initScoreConfig() error {
 	}
 
 	followingK := GetScoreParam(redisClient, "following", "k")
+	followingW := GetScoreParam(redisClient, "following", "w")
 	followersK := GetScoreParam(redisClient, "followers", "k")
+	followersW := GetScoreParam(redisClient, "followers", "w")
 	gistsK := GetScoreParam(redisClient, "gists", "k")
+	gistsW := GetScoreParam(redisClient, "gists", "w")
 	issuesK := GetScoreParam(redisClient, "issues", "k")
+	issuesW := GetScoreParam(redisClient, "issues", "w")
 	organizationsK := GetScoreParam(redisClient, "organizations", "k")
+	organizationsW := GetScoreParam(redisClient, "organizations", "w")
 	projectsK := GetScoreParam(redisClient, "projects", "k")
-	pullRequestsK := GetScoreParam(redisClient, "pullr_equests", "k")
+	projectsW := GetScoreParam(redisClient, "projects", "w")
+	pullRequestsK := GetScoreParam(redisClient, "pull_requests", "k")
+	pullRequestsW := GetScoreParam(redisClient, "pull_requests", "w")
 	contributionsK := GetScoreParam(redisClient, "contributions", "k")
+	contributionsW := GetScoreParam(redisClient, "contributions", "k")
 	starredK := GetScoreParam(redisClient, "starred", "k")
-	watchingk := GetScoreParam(redisClient, "watching", "k")
+	starredW := GetScoreParam(redisClient, "starred", "w")
+	watchingK := GetScoreParam(redisClient, "watching", "k")
+	watchingW := GetScoreParam(redisClient, "watching", "w")
 	commitCommentsK := GetScoreParam(redisClient, "commit_comments", "k")
+	commitCommentsW := GetScoreParam(redisClient, "commit_comments", "w")
 	gistCommentsK := GetScoreParam(redisClient, "gist_comments", "k")
+	gistCommentsW := GetScoreParam(redisClient, "gist_comments", "w")
 	issueCommentsK := GetScoreParam(redisClient, "issue_comments", "k")
+	issueCommentsW := GetScoreParam(redisClient, "issue_comments", "w")
 	reposK := GetScoreParam(redisClient, "repos", "k")
+	reposW := GetScoreParam(redisClient, "repos", "w")
 	commitFrequenzK := GetScoreParam(redisClient, "commit_frequenz", "k")
+	commitFrequenzW := GetScoreParam(redisClient, "commit_frequenz", "w")
 	stargazersK := GetScoreParam(redisClient, "stargazers", "k")
+	stargazersW := GetScoreParam(redisClient, "stargazers", "w")
 	forksK := GetScoreParam(redisClient, "forks", "k")
+	forksW := GetScoreParam(redisClient, "forks", "w")
 
 	scoreConfig := &ScoreParams{
 		FollowingK:      followingK,
+		FollowingW:      followingW,
 		FollowersK:      followersK,
+		FollowersW:      followersW,
 		GistsK:          gistsK,
+		GistsW:          gistsW,
 		IssuesK:         issuesK,
+		IssuesW:         issuesW,
 		OrganizationsK:  organizationsK,
+		OrganizationsW:  organizationsW,
 		ProjectsK:       projectsK,
+		ProjectsW:       projectsW,
 		PullRequestsK:   pullRequestsK,
+		PullRequestsW:   pullRequestsW,
 		ContributionsK:  contributionsK,
+		ContributionsW:  contributionsW,
 		StarredK:        starredK,
-		Watchingk:       watchingk,
+		StarredW:        starredW,
+		Watchingk:       watchingK,
+		WatchingW:       watchingW,
 		CommitCommentsK: commitCommentsK,
+		CommitCommentsW: commitCommentsW,
 		GistCommentsK:   gistCommentsK,
+		GistCommentsW:   gistCommentsW,
 		IssueCommentsK:  issueCommentsK,
+		IssueCommentsW:  issueCommentsW,
 		ReposK:          reposK,
+		ReposW:          reposW,
 		CommitFrequenzK: commitFrequenzK,
+		CommitFrequenzW: commitFrequenzW,
 		StargazersK:     stargazersK,
+		StargazersW:     stargazersW,
 		ForksK:          forksK,
+		ForksW:          forksW,
 	}
 
 	root.ScoreConfig = scoreConfig

@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"log"
 	"time"
 
@@ -15,6 +14,16 @@ func GetUser(userName string) (*db.User, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	config, err := db.GetScoreConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	user.Scores = calcScores(user, config)
+
+	user.ActivityScore = calcActivityScore(user.Scores, config)
+	user.PopularityScore = calcPopularityScore(user.Scores, config)
 
 	go func(user *db.User) {
 		err = db.CacheUser(user)
@@ -76,7 +85,6 @@ func queryUser(userName string) (*db.User, error) {
 			}
 
 		case <-time.After(50 * time.Millisecond):
-			fmt.Println(".")
 			break
 		}
 
