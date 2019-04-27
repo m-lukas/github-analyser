@@ -8,10 +8,9 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/go-chi/chi"
 	"github.com/m-lukas/github-analyser/db"
 	"github.com/m-lukas/github-analyser/regression"
-
-	"github.com/go-chi/chi"
 
 	"github.com/joho/godotenv"
 )
@@ -84,7 +83,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = regression.PopulateDatabase()
+	err = regression.CalcScoreParams()
 	if err != nil {
 		log.Fatal(err)
 	}
