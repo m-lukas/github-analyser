@@ -1,12 +1,15 @@
 package controller
 
 import (
+	"errors"
 	"log"
 	"time"
 
 	"github.com/m-lukas/github-analyser/db"
 	"github.com/m-lukas/github-analyser/graphql"
 )
+
+const timoutSeconds = 15
 
 func GetUser(userName string) (*db.User, error) {
 
@@ -15,15 +18,21 @@ func GetUser(userName string) (*db.User, error) {
 		return nil, err
 	}
 
-	config, err := db.GetScoreConfig()
-	if err != nil {
-		return nil, err
+	if user.Login == "" {
+		return nil, errors.New("User does not exist!")
 	}
 
-	user.Scores = calcScores(user, config)
+	/*
+		config, err := db.GetScoreConfig()
+		if err != nil {
+			return nil, err
+		}
 
-	user.ActivityScore = calcActivityScore(user.Scores, config)
-	user.PopularityScore = calcPopularityScore(user.Scores, config)
+		user.Scores = calcScores(user, config)
+
+		user.ActivityScore = calcActivityScore(user.Scores, config)
+		user.PopularityScore = calcPopularityScore(user.Scores, config)
+	*/
 
 	go func(user *db.User) {
 		err = db.CacheUser(user)
@@ -41,6 +50,8 @@ func queryUser(userName string) (*db.User, error) {
 	generalChannel := make(chan graphql.GeneralDataResponse)
 	commitChannel := make(chan graphql.CommitDataResponse)
 	popularityChannel := make(chan graphql.PopularityDataResponse)
+
+	var startTime = time.Now()
 
 	go func(userName string) {
 		generalChannel <- graphql.GetGeneralData(userName)
@@ -90,6 +101,10 @@ func queryUser(userName string) (*db.User, error) {
 
 		if generalData != nil && commitData != nil && popularityData != nil {
 			break
+		}
+
+		if time.Since(startTime).Seconds() >= float64(timoutSeconds) {
+			return nil, errors.New("Timeout while trying to receive data!")
 		}
 
 	}

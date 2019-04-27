@@ -8,9 +8,8 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/m-lukas/github-analyser/app"
-	"github.com/m-lukas/github-analyser/controller"
 	"github.com/m-lukas/github-analyser/db"
+	"github.com/m-lukas/github-analyser/regression"
 
 	"github.com/go-chi/chi"
 
@@ -80,27 +79,28 @@ func init() {
 
 func main() {
 
-	server := &Server{
-		Config: defaultServerConfig(),
-	}
-
 	err := db.Init()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	data, err := controller.GetUser("m-lukas")
+	err = regression.PopulateDatabase()
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(data)
 
-	server.Router = app.InitRouter(server.Config.APIPath)
+	/*
+		server := &Server{
+			Config: defaultServerConfig(),
+		}
 
-	handler := app.HandleCors(server.Router)
-	server.HTTPServer = configHTTPServer(server.Config, handler)
+		server.Router = app.InitRouter(server.Config.APIPath)
 
-	log.Println("Server has been configurated!")
+		handler := app.HandleCors(server.Router)
+		server.HTTPServer = configHTTPServer(server.Config, handler)
 
-	runServer(server)
+		log.Println("Server has been configurated!")
+
+		runServer(server)
+	*/
 }

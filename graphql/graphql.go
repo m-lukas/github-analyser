@@ -117,7 +117,6 @@ func (c *Client) run(ctx context.Context, request *Request, responseData interfa
 		return errors.New("Retrieved a GraphQL error!")
 	}
 
-	fmt.Println("Successfully retrieved and converted GraphQL response!")
 	return nil
 
 }
