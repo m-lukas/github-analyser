@@ -1,0 +1,66 @@
+package metrix
+
+import "fmt"
+
+const (
+	prefix = "REGRESSION:"
+
+	TYPE_FOLLOWING      = "TYPE_FOLLOWING"
+	TYPE_FOLLOWERS      = "TYPE_FOLLOWERS"
+	TYPE_GISTS          = "TYPE_GISTS"
+	TYPE_ISSUES         = "TYPE_ISSUES"
+	TYPE_ORGANIZATIONS  = "TYPE_ORGANIZATIONS"
+	TYPE_PROJECTS       = "TYPE_PROJECTS"
+	TYPE_PULLREQUESTS   = "TYPE_PULLREQUESTS"
+	TYPE_CONTRIBUTIONS  = "TYPE_CONTRIBUTIONS"
+	TYPE_STARRED        = "TYPE_STARRED"
+	TYPE_WATCHING       = "TYPE_WATCHING"
+	TYPE_COMMITCOMMENTS = "TYPE_COMMITCOMMENTS"
+	TYPE_GISTCOMMENTS   = "TYPE_GISTCOMMENTS"
+	TYPE_ISSUECOMMENTS  = "TYPE_ISSUECOMMENTS"
+	TYPE_REPOS          = "TYPE_REPOS"
+	TYPE_COMMITFREQUENZ = "TYPE_COMMITFREQUENZ"
+	TYPE_STARGAZERS     = "TYPE_STARGAZERS"
+	TYPE_FORKS          = "TYPE_FORKS"
+)
+
+func CalcScoreParams() error {
+
+	inputFiles := []string{"./regression/input/users.txt"}
+	userArray, err := populateData(inputFiles)
+	if err != nil {
+		return err
+	}
+
+	for _, fieldType := range fieldTypes() {
+
+		k := calcK(userArray, fieldType)
+		fmt.Printf("%s: %f\n", fieldType, k)
+
+	}
+
+	return nil
+
+}
+
+func fieldTypes() []string {
+	return []string{
+		TYPE_FOLLOWING,
+		TYPE_FOLLOWERS,
+		TYPE_GISTS,
+		TYPE_ISSUES,
+		TYPE_ORGANIZATIONS,
+		TYPE_PROJECTS,
+		TYPE_PULLREQUESTS,
+		TYPE_CONTRIBUTIONS,
+		TYPE_STARRED,
+		TYPE_WATCHING,
+		TYPE_COMMITCOMMENTS,
+		TYPE_GISTCOMMENTS,
+		TYPE_ISSUECOMMENTS,
+		TYPE_REPOS,
+		TYPE_COMMITFREQUENZ,
+		TYPE_STARGAZERS,
+		TYPE_FORKS,
+	}
+}
