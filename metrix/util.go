@@ -1,8 +1,10 @@
 package metrix
 
 import (
+	"fmt"
 	"math"
 	"strings"
+	"time"
 )
 
 func hasFileFormat(filepath string, format string) bool {
@@ -38,4 +40,15 @@ func distanceToNumber(origin float64, target float64) float64 {
 
 func biggestValueSorted(array []float64) float64 {
 	return array[len(array)-1]
+}
+
+func formatDuration(duration time.Duration) string {
+	duration = duration.Round(time.Second)
+	h := duration / time.Hour
+	duration -= h * time.Hour
+	m := duration / time.Minute
+	duration -= m * time.Minute
+	s := duration / time.Second
+
+	return fmt.Sprintf("%02dh:%02dm:%02ds", h, m, s)
 }

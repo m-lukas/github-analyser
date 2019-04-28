@@ -115,6 +115,21 @@ func GetScoreConfig() (*ScoreParams, error) {
 
 }
 
+//TODO:
+func ReinitializeScoreConfig() error {
+	root, err := getRoot()
+	if err != nil {
+		return err
+	}
+
+	err = root.initScoreConfig()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 /*
 	Initializes the mongoDB Client to access databases and collections.
 */

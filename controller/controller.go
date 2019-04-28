@@ -28,10 +28,10 @@ func GetUser(userName string) (*db.User, error) {
 			return nil, err
 		}
 
-		user.Scores = calcScores(user, config)
+		user.Scores = CalcScores(user, config)
 
-		user.ActivityScore = calcActivityScore(user.Scores, config)
-		user.PopularityScore = calcPopularityScore(user.Scores, config)
+		user.ActivityScore = CalcActivityScore(user.Scores, config)
+		user.PopularityScore = CalcPopularityScore(user.Scores, config)
 	*/
 
 	go func(user *db.User) {

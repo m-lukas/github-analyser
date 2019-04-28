@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/m-lukas/github-analyser/db"
-	"github.com/m-lukas/github-analyser/regression"
+	"github.com/m-lukas/github-analyser/metrix"
 
 	"github.com/joho/godotenv"
 )
@@ -83,7 +83,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = regression.CalcScoreParams()
+	err = metrix.CalcScoreParams()
 	if err != nil {
 		log.Fatal(err)
 	}

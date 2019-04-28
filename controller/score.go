@@ -2,7 +2,7 @@ package controller
 
 import "github.com/m-lukas/github-analyser/db"
 
-func calcActivityScore(scores *db.Scores, config *db.ScoreParams) float64 {
+func CalcActivityScore(scores *db.Scores, config *db.ScoreParams) float64 {
 	var score = 0.0
 
 	score += config.FollowingW * scores.FollowingScore
@@ -25,7 +25,7 @@ func calcActivityScore(scores *db.Scores, config *db.ScoreParams) float64 {
 	return score
 }
 
-func calcPopularityScore(scores *db.Scores, config *db.ScoreParams) float64 {
+func CalcPopularityScore(scores *db.Scores, config *db.ScoreParams) float64 {
 	var score = 0.0
 
 	score += config.FollowersW * scores.FollowersScore
@@ -37,7 +37,7 @@ func calcPopularityScore(scores *db.Scores, config *db.ScoreParams) float64 {
 	return score
 }
 
-func calcScores(user *db.User, config *db.ScoreParams) *db.Scores {
+func CalcScores(user *db.User, config *db.ScoreParams) *db.Scores {
 
 	scores := &db.Scores{
 		FollowingScore:      ScoreFunc(float64(user.Following), config.FollowingK),

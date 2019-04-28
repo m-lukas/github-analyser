@@ -23,6 +23,17 @@ func RedisInsert(client *redis.Client, pairs map[string]interface{}) error {
 
 }
 
+func RedisHashInsert(client *redis.Client, key string, field string, value interface{}) error {
+
+	err := client.HSet(key, field, value).Err()
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}
+
 func RedisGet(client *redis.Client, key string) (interface{}, error) {
 
 	value, err := client.Get(key).Result()
