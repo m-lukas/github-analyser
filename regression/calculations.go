@@ -1,10 +1,16 @@
 package regression
 
 import (
+	"fmt"
 	"math"
 	"sort"
 
 	"github.com/m-lukas/github-analyser/db"
+)
+
+const (
+	LOOP_DIR_UP   = "LOOP_DIR_UP"
+	LOOP_DIR_DOWN = "LOOP_DIR_DOWN"
 )
 
 func calcK(users []*db.User, fieldType string) float64 {
@@ -22,7 +28,7 @@ func calcK(users []*db.User, fieldType string) float64 {
 	if midValue == 0.0 {
 
 		//TODO: Calculate k by highest score
-
+		fmt.Println("ERROR")
 		return 1.0 //ERROR
 	}
 
@@ -84,59 +90,43 @@ func getNearestToAvgValue(valueArray []float64) float64 {
 	midIndex := int(math.Round(float64(len(valueArray) / 2)))
 	midValue := valueArray[midIndex]
 
+	//len(0) or perfectly spreaded
 	if midValue == average {
 		return midValue
 	}
 
+	if len(valueArray) == 2 {
+		return average
+	}
+
+	if len(valueArray) == 3 || len(valueArray) == 4 {
+
+		var loopStart = 1
+		var loopEnd = len(valueArray) - 2
+		var loopDirection = LOOP_DIR_UP
+
+		nearestValue := compareDistanceLoop(valueArray, loopStart, loopEnd, loopDirection, average)
+		return nearestValue
+
+	}
+
 	if midValue < average {
 
-		//ARRAY TOO SHORT!!!!!!!
-		for i := midIndex + 1; i < len(valueArray)-1; i++ {
-			lastVal := valueArray[i-1]
-			currentVal := valueArray[i]
-			nextVal := valueArray[i+1]
+		var loopStart = midIndex + 1
+		var loopEnd = len(valueArray) - 2
+		var loopDirection = LOOP_DIR_UP
 
-			distanceFromLast := distanceToNumber(lastVal, average)
-			distanceFromCurrent := distanceToNumber(currentVal, average)
-			distanceFromNext := distanceToNumber(nextVal, average)
-
-			if distanceFromCurrent > distanceFromLast {
-				return lastVal
-			}
-
-			if distanceFromCurrent < distanceFromNext {
-				return currentVal
-			}
-
-			if i == len(valueArray)-2 {
-				return nextVal
-			}
-		}
+		nearestValue := compareDistanceLoop(valueArray, loopStart, loopEnd, loopDirection, average)
+		return nearestValue
 
 	} else {
 
-		//ARRAY TOO SHORT!!!!!!!
-		for i := midIndex - 1; i > 1; i-- {
-			lastVal := valueArray[i+1]
-			currentVal := valueArray[i]
-			nextVal := valueArray[i-1]
+		var loopStart = midIndex - 1
+		var loopEnd = 1
+		var loopDirection = LOOP_DIR_DOWN
 
-			distanceFromLast := distanceToNumber(lastVal, average)
-			distanceFromCurrent := distanceToNumber(currentVal, average)
-			distanceFromNext := distanceToNumber(nextVal, average)
-
-			if distanceFromCurrent > distanceFromLast {
-				return lastVal
-			}
-
-			if distanceFromCurrent < distanceFromNext {
-				return currentVal
-			}
-
-			if i == len(valueArray)-2 {
-				return nextVal
-			}
-		}
+		nearestValue := compareDistanceLoop(valueArray, loopStart, loopEnd, loopDirection, average)
+		return nearestValue
 
 	}
 
@@ -146,5 +136,70 @@ func getNearestToAvgValue(valueArray []float64) float64 {
 
 func calcKFromY(y float64, x float64) float64 {
 	return x/y - 0.01*x
+}
+
+func compareDistanceLoop(valueArray []float64, startIndex int, endIndex int, direction string, average float64) float64 {
+
+	switch direction {
+	case LOOP_DIR_UP:
+
+		for i := startIndex; i <= endIndex; i++ {
+
+			lastVal := valueArray[i-1]
+			currentVal := valueArray[i]
+			nextVal := valueArray[i+1]
+
+			nearest := nearestDistance(average, lastVal, currentVal, nextVal)
+			if nearest != nextVal {
+				return nearest
+			}
+
+			//last iteration
+			if i == endIndex {
+				return nextVal
+			}
+		}
+
+	case LOOP_DIR_DOWN:
+
+		for i := startIndex; i >= endIndex; i-- {
+			lastVal := valueArray[i+1]
+			currentVal := valueArray[i]
+			nextVal := valueArray[i-1]
+
+			nearest := nearestDistance(average, lastVal, currentVal, nextVal)
+			if nearest != nextVal {
+				return nearest
+			}
+
+			//last iteration
+			if i == endIndex {
+				return nextVal
+			}
+		}
+
+	default:
+		return 0.0
+	}
+
+	return 0.0
+
+}
+
+func nearestDistance(target float64, first float64, second float64, third float64) float64 {
+
+	distanceFromFirst := distanceToNumber(first, target)
+	distanceFromSecond := distanceToNumber(second, target)
+	distanceFromThird := distanceToNumber(third, target)
+
+	if distanceFromSecond > distanceFromFirst {
+		return first
+	}
+
+	if distanceFromSecond < distanceFromThird {
+		return second
+	}
+
+	return third
 
 }

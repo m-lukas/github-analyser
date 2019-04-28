@@ -1,6 +1,4 @@
-m-lukas
 sindresorhus
-Urhengulas
-alexmorten
 nat
 alecgrieser
+Urhengulas
