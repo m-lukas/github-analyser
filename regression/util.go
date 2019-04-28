@@ -35,3 +35,7 @@ func avg(values []float64) float64 {
 func distanceToNumber(origin float64, target float64) float64 {
 	return math.Abs(target - origin)
 }
+
+func biggestValueSorted(array []float64) float64 {
+	return array[len(array)-1]
+}

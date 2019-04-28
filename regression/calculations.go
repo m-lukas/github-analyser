@@ -1,7 +1,6 @@
 package regression
 
 import (
-	"fmt"
 	"math"
 	"sort"
 
@@ -24,12 +23,15 @@ func calcK(users []*db.User, fieldType string) float64 {
 
 	}
 
+	sort.Float64s(valueArray)
+
 	midValue := getNearestToAvgValue(valueArray)
 	if midValue == 0.0 {
 
-		//TODO: Calculate k by highest score
-		fmt.Println("ERROR")
-		return 1.0 //ERROR
+		biggestValue := biggestValueSorted(valueArray)
+
+		k := calcKFromY(99.9999, biggestValue)
+		return k
 	}
 
 	var avgScore = 50.0
@@ -84,7 +86,6 @@ func getField(user *db.User, fieldType string) float64 {
 
 func getNearestToAvgValue(valueArray []float64) float64 {
 
-	sort.Float64s(valueArray)
 	average := avg(valueArray)
 
 	midIndex := int(math.Round(float64(len(valueArray) / 2)))
