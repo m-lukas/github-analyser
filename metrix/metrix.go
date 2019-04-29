@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	prefix = "METRIX:"
+	prefix = "METRIX |"
 
 	TYPE_FOLLOWING      = "TYPE_FOLLOWING"
 	TYPE_FOLLOWERS      = "TYPE_FOLLOWERS"

@@ -13,6 +13,11 @@ import (
 	"github.com/m-lukas/github-analyser/util"
 )
 
+const (
+	cooldown  int = 12
+	blockSize int = 10
+)
+
 type UserResponse struct {
 	Login string
 	User  *db.User
@@ -89,79 +94,92 @@ func readInput(filepathes []string) ([]string, error) {
 func queryUserData(inputArray []string) []*db.User {
 
 	fmt.Printf("%s --- STARTING TO QUERY USERS ---\n", prefix)
-
 	var queriedUsers []*db.User
-	channel := make(chan UserResponse)
-	startTime := time.Now()
 
-	timeDelay := 0
-
-	for index, login := range inputArray {
-
-		go func(userLogin string, delay int) {
-
-			time.Sleep(time.Duration(delay) * time.Second)
-
-			user, err := controller.GetUser(userLogin)
-			if err != nil {
-				channel <- UserResponse{Login: userLogin, User: nil, Error: err}
-			} else {
-				channel <- UserResponse{Login: userLogin, User: user, Error: nil}
-			}
-
-		}(login, timeDelay)
-
-		timeDelay += 1
-
-		if index == 100 {
-			break
-		}
-
-	}
-
+	var numberOfResponses = 0
 	var queryLength = len(inputArray)
-	var numberOfResponse = 0
+	var startTime = time.Now()
 
 	for {
-		select {
-		case resp := <-channel:
 
-			numberOfResponse++
-			if resp.Error != nil {
-				fmt.Println(resp.Error)
-				fmt.Printf("%s %d/%d Trying to get user data from cache for: %s\n", prefix, numberOfResponse, queryLength, resp.Login)
-				dbData, err := getUserFromCache(resp.Login)
+		if numberOfResponses == 100 {
+			return queriedUsers
+		}
+
+		var block []string
+
+		inputArray, block = popN(inputArray, blockSize)
+		if len(block) == 0 {
+			break
+		}
+
+		channel := make(chan UserResponse)
+
+		for _, login := range block {
+
+			go func(userLogin string) {
+
+				user, err := controller.GetUser(userLogin)
 				if err != nil {
-					fmt.Printf("%s %d/%d Failed to get data of user: %s\n", prefix, numberOfResponse, queryLength, resp.Login)
+					channel <- UserResponse{Login: userLogin, User: nil, Error: err}
 				} else {
-					querySuccessMessage(resp.Login, startTime, numberOfResponse, queryLength)
-					queriedUsers = append(queriedUsers, dbData)
+					channel <- UserResponse{Login: userLogin, User: user, Error: nil}
 				}
-			} else {
-				querySuccessMessage(resp.Login, startTime, numberOfResponse, queryLength)
-				queriedUsers = append(queriedUsers, resp.User)
+
+			}(login)
+
+		}
+
+		numberOfResponse := 0
+
+		for {
+			select {
+			case resp := <-channel:
+
+				numberOfResponse++
+				numberOfResponses++
+				if resp.Error != nil {
+					fmt.Printf("%s %d/%d Failed to get data of user: %s\n", prefix, numberOfResponses, queryLength, resp.Login)
+					/*
+						fmt.Printf("%s %d/%d Trying to get user data from cache for: %s\n", prefix, numberOfResponses, queryLength, resp.Login)
+						dbData, err := getUserFromCache(resp.Login)
+						if err != nil {
+							fmt.Printf("%s %d/%d Failed to get data of user: %s\n", prefix, numberOfResponses, queryLength, resp.Login)
+						} else {
+							querySuccessMessage(resp.Login, startTime, numberOfResponses, queryLength)
+							queriedUsers = append(queriedUsers, dbData)
+						}
+					*/
+				} else {
+					querySuccessMessage(resp.Login, startTime, numberOfResponses, queryLength)
+					queriedUsers = append(queriedUsers, resp.User)
+				}
+
+			case <-time.After(50 * time.Millisecond):
+				break
+
 			}
 
-		case <-time.After(50 * time.Millisecond):
-			break
+			if numberOfResponse == blockSize {
+				fmt.Printf("%s --- COOLDOWN: %ds ---\n", prefix, cooldown)
+				fmt.Printf("%s --- TIME: %s ---\n", prefix, formatDuration(time.Since(startTime)))
+				break
+			}
 
 		}
 
-		if numberOfResponse == len(inputArray) {
-			fmt.Printf("%s --- FINISHED QUERYING USERS ---\n", prefix)
-			break
-		}
+		time.Sleep(time.Duration(cooldown) * time.Second)
 
 	}
+
+	fmt.Printf("%s --- FINISHED QUERYING USERS ---\n", prefix)
 
 	return queriedUsers
 
 }
 
 func querySuccessMessage(login string, startTime time.Time, n int, overall int) {
-	timeDiff := time.Since(startTime)
-	timeDiffString := fmt.Sprintf("%fs", timeDiff.Seconds())
-	fmt.Printf("%s %d/%d User: %s, Time: %s\n", prefix, n, overall, login, timeDiffString)
+	fmt.Printf("%s %d/%d User: %s, Time: %s\n", prefix, n, overall, login, formatDuration(time.Since(startTime)))
 }
 
 func getUserFromCache(login string) (*db.User, error) {

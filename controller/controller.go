@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"time"
 
@@ -21,7 +22,7 @@ func GetUser(userName string) (*db.User, error) {
 	if user.Login == "" {
 		return nil, errors.New("User does not exist!")
 	}
-
+	//TODO: ENVIROMENTS
 	/*
 		config, err := db.GetScoreConfig()
 		if err != nil {
@@ -61,19 +62,23 @@ func queryUser(userName string) (*db.User, error) {
 		commitChannel <- graphql.GetCommitData(userName)
 	}(userName)
 
-	go func(userName string) {
-		popularityChannel <- graphql.GetPopularity(userName)
-	}(userName)
+	/*
+		go func(userName string) {
+			popularityChannel <- graphql.GetPopularity(userName)
+		}(userName)
+	*/
 
 	var generalData *graphql.GeneralData
 	var commitData *graphql.CommitData
-	var popularityData *graphql.Popularity
+	var popularityData *graphql.Popularity //TODO:
+	popularityData = &graphql.Popularity{}
 
 	for {
 		select {
 		case resp := <-generalChannel:
 
 			if resp.Error != nil {
+				fmt.Printf("General: %v", resp.Error)
 				return nil, resp.Error
 			} else {
 				generalData = resp.Data
@@ -82,6 +87,7 @@ func queryUser(userName string) (*db.User, error) {
 		case resp := <-commitChannel:
 
 			if resp.Error != nil {
+				fmt.Printf("Commit: %v", resp.Error)
 				return nil, resp.Error
 			} else {
 				commitData = resp.Data
@@ -90,6 +96,7 @@ func queryUser(userName string) (*db.User, error) {
 		case resp := <-popularityChannel:
 
 			if resp.Error != nil {
+				fmt.Printf("Population: %v", resp.Error)
 				return nil, resp.Error
 			} else {
 				popularityData = resp.Data
@@ -99,7 +106,7 @@ func queryUser(userName string) (*db.User, error) {
 			break
 		}
 
-		if generalData != nil && commitData != nil && popularityData != nil {
+		if generalData != nil && commitData != nil /*&& popularityData != nil*/ { //TODO:
 			break
 		}
 
