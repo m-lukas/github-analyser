@@ -22,7 +22,7 @@ func GetUser(userName string) (*db.User, error) {
 	if user.Login == "" {
 		return nil, errors.New("User does not exist!")
 	}
-	//TODO: ENVIROMENTS
+
 	/*
 		config, err := db.GetScoreConfig()
 		if err != nil {
@@ -62,16 +62,13 @@ func queryUser(userName string) (*db.User, error) {
 		commitChannel <- graphql.GetCommitData(userName)
 	}(userName)
 
-	/*
-		go func(userName string) {
-			popularityChannel <- graphql.GetPopularity(userName)
-		}(userName)
-	*/
+	go func(userName string) {
+		popularityChannel <- graphql.GetPopularity(userName)
+	}(userName)
 
 	var generalData *graphql.GeneralData
 	var commitData *graphql.CommitData
-	var popularityData *graphql.Popularity //TODO:
-	popularityData = &graphql.Popularity{}
+	var popularityData *graphql.Popularity
 
 	for {
 		select {
@@ -106,7 +103,7 @@ func queryUser(userName string) (*db.User, error) {
 			break
 		}
 
-		if generalData != nil && commitData != nil /*&& popularityData != nil*/ { //TODO:
+		if generalData != nil && commitData != nil && popularityData != nil {
 			break
 		}
 
