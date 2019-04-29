@@ -20,6 +20,7 @@ func hasFileFormat(filepath string, format string) bool {
 
 }
 
+//TODO: DUPLICATE! -> move to utils
 func avg(values []float64) float64 {
 
 	var sum float64

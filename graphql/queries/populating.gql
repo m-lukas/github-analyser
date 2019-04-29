@@ -1,0 +1,56 @@
+query POPULATING($name: String!) {
+  rateLimit {
+    cost
+    remaining
+  }
+  repositoryOwner(login: $name) {
+      ... on User {
+      following(first: 100) {
+        edges{
+          node{
+            login
+            ... on User {
+              following(first: 100) {
+                edges{
+                  node{
+                    login
+                  }
+                }
+              }
+              followers(first: 100) {
+                edges{
+                  node{
+                    login
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      followers(first: 100) {
+        edges{
+          node{
+            login
+            ... on User {
+              following(first: 100) {
+                edges{
+                  node{
+                    login  
+                  }
+                }
+              }
+              followers(first: 100) {
+                edges{
+                  node{
+                    login
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -42,7 +42,7 @@ func GetPopularity(userName string) PopularityDataResponse {
 
 	var popularityData PopularityRaw
 
-	err := query(userName, "./graphql/queries/popularity.gql", &popularityData)
+	err := queryPop(userName, &popularityData)
 	if err != nil {
 		return PopularityDataResponse{Data: nil, Error: err}
 	}

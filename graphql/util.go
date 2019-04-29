@@ -31,3 +31,20 @@ func avg(slice []float64) float64 {
 	return sum / float64(len(slice))
 
 }
+
+func removeDuplicates(slice []string) []string {
+
+	keys := make(map[string]bool)
+	cleaned := []string{}
+
+	for _, value := range slice {
+		exists := keys[value]
+		if !exists {
+			keys[value] = true
+			cleaned = append(cleaned, value)
+		}
+	}
+
+	return cleaned
+
+}

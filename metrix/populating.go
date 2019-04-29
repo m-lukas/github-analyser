@@ -9,6 +9,7 @@ import (
 
 	"github.com/m-lukas/github-analyser/controller"
 	"github.com/m-lukas/github-analyser/db"
+	"github.com/m-lukas/github-analyser/graphql"
 	"github.com/m-lukas/github-analyser/util"
 )
 
@@ -20,7 +21,14 @@ type UserResponse struct {
 
 func populateData(filepaths []string) ([]*db.User, error) {
 
-	inputArray, err := readInput(filepaths)
+	/*
+		inputArray, err := readInput(filepaths)
+		if err != nil {
+			return nil, err
+		}
+	*/
+
+	inputArray, err := graphql.GetPopulatingData("sindresorhus")
 	if err != nil {
 		return nil, err
 	}
@@ -86,9 +94,13 @@ func queryUserData(inputArray []string) []*db.User {
 	channel := make(chan UserResponse)
 	startTime := time.Now()
 
-	for _, login := range inputArray {
+	timeDelay := 0
 
-		go func(userLogin string) {
+	for index, login := range inputArray {
+
+		go func(userLogin string, delay int) {
+
+			time.Sleep(time.Duration(delay) * time.Second)
 
 			user, err := controller.GetUser(userLogin)
 			if err != nil {
@@ -97,7 +109,13 @@ func queryUserData(inputArray []string) []*db.User {
 				channel <- UserResponse{Login: userLogin, User: user, Error: nil}
 			}
 
-		}(login)
+		}(login, timeDelay)
+
+		timeDelay += 1
+
+		if index == 100 {
+			break
+		}
 
 	}
 
@@ -110,6 +128,7 @@ func queryUserData(inputArray []string) []*db.User {
 
 			numberOfResponse++
 			if resp.Error != nil {
+				fmt.Println(resp.Error)
 				fmt.Printf("%s %d/%d Trying to get user data from cache for: %s\n", prefix, numberOfResponse, queryLength, resp.Login)
 				dbData, err := getUserFromCache(resp.Login)
 				if err != nil {

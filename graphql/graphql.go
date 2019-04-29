@@ -143,3 +143,78 @@ func query(userName string, query string, object interface{}) error {
 	return nil
 
 }
+
+func queryPop(userName string, object interface{}) error {
+
+	client := newClient("https://api.github.com/graphql", nil)
+
+	query := `query POPULATING($name: String!) {
+		rateLimit {
+		  cost
+		  remaining
+		}
+		repositoryOwner(login: $name) {
+			... on User {
+			following(first: 100) {
+			  edges{
+				node{
+				  login
+				  ... on User {
+					following(first: 100) {
+					  edges{
+						node{
+						  login
+						}
+					  }
+					}
+					followers(first: 100) {
+					  edges{
+						node{
+						  login
+						}
+					  }
+					}
+				  }
+				}
+			  }
+			}
+			followers(first: 100) {
+			  edges{
+				node{
+				  login
+				  ... on User {
+					following(first: 100) {
+					  edges{
+						node{
+						  login  
+						}
+					  }
+					}
+					followers(first: 100) {
+					  edges{
+						node{
+						  login
+						}
+					  }
+					}
+				  }
+				}
+			  }
+			}
+		  }
+		}
+	  }`
+
+	request := newRequest(query)
+	request.variable("name", userName)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	err := client.run(ctx, request, object)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}
