@@ -61,7 +61,7 @@ func GetPopulatingData(rootUser string) ([]string, error) {
 
 	var rawData PopulatingDataRaw
 
-	err := queryPop(rootUser, &rawData)
+	err := query(rootUser, "./graphql/queries/populating.gql", &rawData)
 	if err != nil {
 		return nil, err
 	}
