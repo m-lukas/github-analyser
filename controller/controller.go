@@ -50,7 +50,6 @@ func queryUser(userName string) (*db.User, error) {
 
 	generalChannel := make(chan graphql.GeneralDataResponse)
 	commitChannel := make(chan graphql.CommitDataResponse)
-	popularityChannel := make(chan graphql.PopularityDataResponse)
 
 	var startTime = time.Now()
 
@@ -62,13 +61,8 @@ func queryUser(userName string) (*db.User, error) {
 		commitChannel <- graphql.GetCommitData(userName)
 	}(userName)
 
-	go func(userName string) {
-		popularityChannel <- graphql.GetPopularity(userName)
-	}(userName)
-
 	var generalData *graphql.GeneralData
 	var commitData *graphql.CommitData
-	var popularityData *graphql.Popularity
 
 	for {
 		select {
@@ -90,20 +84,11 @@ func queryUser(userName string) (*db.User, error) {
 				commitData = resp.Data
 			}
 
-		case resp := <-popularityChannel:
-
-			if resp.Error != nil {
-				fmt.Printf("Population: %v", resp.Error)
-				return nil, resp.Error
-			} else {
-				popularityData = resp.Data
-			}
-
 		case <-time.After(50 * time.Millisecond):
 			break
 		}
 
-		if generalData != nil && commitData != nil && popularityData != nil {
+		if generalData != nil && commitData != nil {
 			break
 		}
 
@@ -141,8 +126,8 @@ func queryUser(userName string) (*db.User, error) {
 		IssueComments:             generalData.IssueComments,
 		Repositories:              generalData.Repositories,
 		CommitFrequenz:            commitData.CommitFrequenz,
-		Stargazers:                popularityData.Stargazers,
-		Forks:                     popularityData.Forks,
+		Stargazers:                generalData.Stargazers,
+		Forks:                     generalData.Forks,
 		UpdatedAt:                 time.Now(),
 	}
 

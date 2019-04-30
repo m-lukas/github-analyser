@@ -83,6 +83,14 @@ func main() {
 		log.Fatal(err)
 	}
 
+	/*
+		err = setup.SetupInputFile("sindresorhus")
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println("written successfully")
+	*/
+
 	err = metrix.CalcScoreParams()
 	if err != nil {
 		log.Fatal(err)

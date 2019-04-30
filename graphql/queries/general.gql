@@ -23,6 +23,9 @@ query GENERAL($name: String!) {
       followers(first: 0) {
         totalCount
       }
+      following(first: 0){
+        totalCount
+      }
       gists(first: 0) {
         totalCount
       }
@@ -38,8 +41,19 @@ query GENERAL($name: String!) {
       pullRequests(first: 0) {
         totalCount
       }
-      repositories(first: 0) {
+      repositories(first: 50, orderBy: {field: STARGAZERS, direction: DESC}){
         totalCount
+        edges{
+          node{
+            nameWithOwner
+            stargazers(first: 0){
+              totalCount
+            }
+            forks(first: 0){
+              totalCount
+            }
+          }
+        }
       }
       repositoriesContributedTo(first: 0) {
         totalCount

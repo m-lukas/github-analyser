@@ -2,6 +2,7 @@ package graphql
 
 import (
 	"errors"
+	"strings"
 	"time"
 )
 
@@ -61,6 +62,17 @@ type GeneralDataRaw struct {
 		}
 		Repositories struct {
 			TotalCount int
+			Edges      []struct {
+				Node struct {
+					NameWithOwner string
+					Stargazers    struct {
+						TotalCount int
+					}
+					Forks struct {
+						TotalCount int
+					}
+				}
+			}
 		}
 	}
 }
@@ -92,6 +104,8 @@ type GeneralData struct {
 	GistComments              int
 	IssueComments             int
 	Repositories              int
+	Stargazers                int
+	Forks                     int
 }
 
 type GeneralDataResponse struct {
@@ -121,6 +135,7 @@ func GetGeneralData(userName string) GeneralDataResponse {
 func convertGeneralData(rawData *GeneralDataRaw) *GeneralData {
 
 	data := rawData.RepositoryOwner
+	stargazers, forks := calcStargazersAndForks(rawData, data.Login)
 
 	convertedData := &GeneralData{
 		Login:                     data.Login,
@@ -149,8 +164,49 @@ func convertGeneralData(rawData *GeneralDataRaw) *GeneralData {
 		GistComments:              data.GistComments.TotalCount,
 		IssueComments:             data.IssueComments.TotalCount,
 		Repositories:              data.Repositories.TotalCount,
+		Forks:                     forks,
+		Stargazers:                stargazers,
 	}
 
 	return convertedData
+
+}
+
+func calcStargazersAndForks(rawData *GeneralDataRaw, userName string) (int, int) {
+
+	var stargazersSum int
+	var forksSum int
+
+	repoCounter := 0
+	maxRepoNum := 25
+
+	repositorySlice := rawData.RepositoryOwner.Repositories.Edges
+
+	for _, repo := range repositorySlice {
+
+		repoNode := repo.Node
+		owner := strings.Split(repoNode.NameWithOwner, "/")[0]
+
+		if owner != userName {
+			continue
+		} else {
+
+			stargazers := repoNode.Stargazers.TotalCount
+			forks := repoNode.Forks.TotalCount
+
+			stargazersSum += stargazers
+			forksSum += forks
+
+		}
+
+		if repoCounter >= maxRepoNum {
+			break
+		} else {
+			repoCounter++
+		}
+
+	}
+
+	return stargazersSum, forksSum
 
 }

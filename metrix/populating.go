@@ -9,12 +9,11 @@ import (
 
 	"github.com/m-lukas/github-analyser/controller"
 	"github.com/m-lukas/github-analyser/db"
-	"github.com/m-lukas/github-analyser/graphql"
 	"github.com/m-lukas/github-analyser/util"
 )
 
 const (
-	cooldown  int = 12
+	cooldown  int = 15
 	blockSize int = 10
 )
 
@@ -26,14 +25,7 @@ type UserResponse struct {
 
 func populateData(filepaths []string) ([]*db.User, error) {
 
-	/*
-		inputArray, err := readInput(filepaths)
-		if err != nil {
-			return nil, err
-		}
-	*/
-
-	inputArray, err := graphql.GetPopulatingData("sindresorhus")
+	inputArray, err := readInput(filepaths)
 	if err != nil {
 		return nil, err
 	}
