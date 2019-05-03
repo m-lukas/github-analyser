@@ -17,7 +17,7 @@ func Test_Files(t *testing.T) {
 	t.Run("not able to write file", func(t *testing.T) {
 		var err error
 
-		err = writeFile(write_test, []string{"test1", "test2", "test3"})
+		err = WriteFile(write_test, []string{"test1", "test2", "test3"})
 		fmt.Println(err)
 		assert.Nil(t, err)
 
@@ -43,14 +43,14 @@ func Test_Files(t *testing.T) {
 		var err error
 		var expected = []string{"hallo", "hello", "salut"}
 
-		output, err = readInputFiles([]string{read_test})
+		output, err = ReadInputFiles([]string{read_test})
 		assert.Nil(t, err)
 		assert.Equal(t, expected, output)
 
-		output, err = readInputFiles([]string{read_test, "file_name.png"})
+		output, err = ReadInputFiles([]string{read_test, "file_name.png"})
 		assert.Error(t, err)
 
-		output, err = readInputFiles([]string{read_test, read_test})
+		output, err = ReadInputFiles([]string{read_test, read_test})
 		assert.Nil(t, err)
 		assert.Equal(t, expected, output)
 	})

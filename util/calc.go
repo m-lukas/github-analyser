@@ -1,5 +1,7 @@
 package util
 
+import "math"
+
 func Avg(values []float64) float64 {
 
 	var sum float64
@@ -12,4 +14,12 @@ func Avg(values []float64) float64 {
 	average := sum / lenght
 
 	return average
+}
+
+func DistanceToNumber(origin float64, target float64) float64 {
+	return math.Abs(target - origin)
+}
+
+func BiggestValueSorted(array []float64) float64 {
+	return array[len(array)-1]
 }
