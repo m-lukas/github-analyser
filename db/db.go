@@ -3,37 +3,26 @@ package db
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 	"os"
 	"time"
 
 	"github.com/go-redis/redis"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 var dbRoot *DatabaseRoot
 
 type DatabaseRoot struct {
-	MongoClient *mongo.Client
+	MongoClient *MongoClient
 	RedisClient *redis.Client
-	Config      *DatabaseConfig
 	ScoreConfig *ScoreParams
-}
-
-type DatabaseConfig struct {
-	MongoDatabaseName string
-	MongoURI          string
 }
 
 func Init() error {
 	var err error
 
-	dbRoot = &DatabaseRoot{
-		Config: defaultDatabaseConfig(),
-	}
+	dbRoot = &DatabaseRoot{}
 
 	err = dbRoot.initMongoClient()
 	if err != nil {
@@ -53,7 +42,7 @@ func Init() error {
 	return nil
 }
 
-func GetMongo() (*mongo.Database, error) {
+func GetMongo() (*MongoClient, error) {
 
 	root, err := getRoot()
 	if err != nil {
@@ -62,7 +51,7 @@ func GetMongo() (*mongo.Database, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	err = root.MongoClient.Ping(ctx, readpref.Primary())
+	err = root.MongoClient.Client.Ping(ctx, readpref.Primary())
 	if err != nil {
 		err := root.initMongoClient()
 		if err != nil {
@@ -70,10 +59,9 @@ func GetMongo() (*mongo.Database, error) {
 		}
 	}
 
-	client := root.MongoClient
-	config := root.Config
-	db := client.Database(config.MongoDatabaseName)
-	return db, nil
+	mongoClient := root.MongoClient
+	return mongoClient, nil
+
 }
 
 func GetRedis() (*redis.Client, error) {
@@ -133,25 +121,6 @@ func ReinitializeScoreConfig() error {
 /*
 	Initializes the mongoDB Client to access databases and collections.
 */
-func (root *DatabaseRoot) initMongoClient() error {
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(root.Config.MongoURI))
-	if err != nil {
-		return err
-	}
-
-	err = client.Ping(ctx, readpref.Primary())
-	if err != nil {
-		return err
-	}
-
-	root.MongoClient = client
-	log.Println("Initialized mongo client!")
-
-	return nil
-}
 
 func (root *DatabaseRoot) initRedisClient() error {
 
@@ -263,13 +232,6 @@ func (root *DatabaseRoot) initScoreConfig() error {
 
 }
 
-func defaultDatabaseConfig() *DatabaseConfig {
-	return &DatabaseConfig{
-		MongoDatabaseName: "core",
-		MongoURI:          getMongoURI(),
-	}
-}
-
 func getRoot() (*DatabaseRoot, error) {
 
 	var err error
@@ -293,18 +255,6 @@ func checkDbRoot() error {
 	}
 
 	return nil
-}
-
-/*
-	Returns configurated URI string for MongoDB.
-*/
-func getMongoURI() (uri string) {
-	dbHost := os.Getenv("MONGO_HOST")
-	dbName := os.Getenv("MONGO_NAME")
-	dbUser := os.Getenv("MONGO_USER")
-	dbPass := os.Getenv("MONGO_PASS")
-
-	return fmt.Sprintf(`mongodb://%s:%s@%s/%s`, dbUser, dbPass, dbHost, dbName)
 }
 
 func getRedisURI() (uri string) {

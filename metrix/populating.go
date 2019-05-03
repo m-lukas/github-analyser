@@ -1,15 +1,14 @@
 package metrix
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
-	"os"
 	"time"
+
+	"github.com/m-lukas/github-analyser/util"
 
 	"github.com/m-lukas/github-analyser/controller"
 	"github.com/m-lukas/github-analyser/db"
-	"github.com/m-lukas/github-analyser/util"
 )
 
 const (
@@ -25,7 +24,7 @@ type UserResponse struct {
 
 func populateData(filepaths []string) ([]*db.User, error) {
 
-	inputArray, err := readInput(filepaths)
+	inputArray, err := util.ReadInputFiles(filepaths)
 	if err != nil {
 		return nil, err
 	}
@@ -36,51 +35,6 @@ func populateData(filepaths []string) ([]*db.User, error) {
 	}
 
 	return userArray, nil
-}
-
-func readInput(filepathes []string) ([]string, error) {
-
-	var inputArray []string
-	var successfulFileCount = 0
-
-	for index, filepath := range filepathes {
-
-		fmt.Printf("%s Started scanning of file: %s\n", prefix, filepath)
-		fmt.Printf("%s Scanning file: %d/%d\n", prefix, index+1, len(filepathes))
-
-		if !hasFileFormat(filepath, "txt") {
-			fmt.Printf("%s Wrong file format: %s\n", prefix, filepath)
-			continue
-		}
-
-		file, err := os.Open(filepath)
-		if err != nil {
-			fmt.Printf("%s Could not open file: %s\n", prefix, filepath)
-			return nil, err
-		}
-		defer file.Close()
-
-		scanner := bufio.NewScanner(file)
-		for scanner.Scan() {
-			line := scanner.Text()
-			if line != "" && !util.Contains(inputArray, line) {
-				inputArray = append(inputArray, line)
-			}
-		}
-
-		if err := scanner.Err(); err != nil {
-			fmt.Printf("%s Error while scanning file: %s\n", prefix, filepath)
-			return nil, err
-		}
-
-		successfulFileCount++
-		fmt.Printf("%s Finished file: %s\n", prefix, filepath)
-	}
-
-	fmt.Printf("%s Successful: %d/%d\n", prefix, successfulFileCount, len(filepathes))
-
-	return inputArray, nil
-
 }
 
 func queryUserData(inputArray []string) []*db.User {

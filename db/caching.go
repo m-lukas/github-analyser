@@ -6,27 +6,26 @@ import (
 
 func CacheUser(user *User) error {
 
-	db, err := GetMongo()
+	client, err := GetMongo()
 	if err != nil {
 		return err
 	}
-	collection := db.Collection("users")
+	collectionName := "users"
 
-	dbUser, err := FindUser(user.Login, collection)
+	dbUser, err := client.FindUser(user.Login, collectionName)
 	if dbUser != nil {
 		filter := bson.D{{"login", user.Login}}
-		err = UpdateAll(filter, user, collection)
+		err = client.UpdateAll(filter, user, collectionName)
 		if err != nil {
 			return err
 		}
 
 	} else {
-		err = Insert(user, collection)
+		err = client.Insert(user, collectionName)
 		if err != nil {
 			return err
 		}
 	}
 
 	return nil
-
 }
