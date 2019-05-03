@@ -1,74 +1,63 @@
 package db
 
 import (
-	"errors"
 	"log"
+	"os"
 	"strconv"
 
 	"github.com/go-redis/redis"
 )
 
-func RedisInsert(client *redis.Client, pairs map[string]interface{}) error {
-
-	for key, value := range pairs {
-
-		err := client.Set(key, value, 0).Err()
-		if err != nil {
-			return err
-		}
-
-	}
-
-	return nil
-
+type RedisClient struct {
+	Client *redis.Client
+	Config *RedisConfig
 }
 
-func RedisHashInsert(client *redis.Client, key string, field string, value interface{}) error {
+type RedisConfig struct {
+	URI        string
+	Password   string
+	DatabaseID int
+}
 
-	err := client.HSet(key, field, value).Err()
+func (client *RedisClient) getDefaultConfig() *RedisConfig {
+	databaseID, err := strconv.Atoi(os.Getenv("REDIS_DB"))
+	if err != nil {
+		databaseID = 0
+	}
+
+	return &RedisConfig{
+		URI:        getRedisURI(),
+		Password:   os.Getenv("REDIS_PASS"),
+		DatabaseID: databaseID,
+	}
+}
+
+func (root *DatabaseRoot) initRedisClient() error {
+
+	redisClient := &RedisClient{}
+	config := redisClient.getDefaultConfig()
+	redisClient.Config = config
+
+	client := redis.NewClient(&redis.Options{
+		Addr:     config.URI,
+		Password: config.Password,
+		DB:       config.DatabaseID,
+	})
+
+	_, err := client.Ping().Result()
 	if err != nil {
 		return err
 	}
 
+	redisClient.Client = client
+	root.RedisClient = redisClient
+	log.Println("Initialized redis client!")
+
 	return nil
 
 }
 
-func RedisGet(client *redis.Client, key string) (interface{}, error) {
-
-	value, err := client.Get(key).Result()
-
-	if err == redis.Nil {
-		return nil, errors.New("key does not exist!")
-	} else if err != nil {
-		return nil, err
-	} else {
-		return value, nil
-	}
-
-}
-
-//TODO: use RedisGet with error wrapper
-func GetScoreParam(client *redis.Client, key string, field string) float64 {
-
-	value, err := client.HGet(key, field).Result()
-
-	if err == redis.Nil {
-		err = client.HSet(key, field, 1.0).Err()
-		if err != nil {
-			log.Fatal(err)
-		}
-		return 1.0
-	} else if err != nil {
-		log.Fatal(err)
-	} else {
-		float, err := strconv.ParseFloat(value, 64)
-		if err != nil {
-			log.Fatal("false field type in redis hash!")
-		}
-		return float
-	}
-
-	return 1.0
-
+func getRedisURI() (uri string) {
+	dbHost := os.Getenv("REDIS_HOST")
+	return dbHost
 }

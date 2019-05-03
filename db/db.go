@@ -2,12 +2,9 @@ package db
 
 import (
 	"context"
-	"errors"
 	"log"
-	"os"
 	"time"
 
-	"github.com/go-redis/redis"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
@@ -15,7 +12,7 @@ var dbRoot *DatabaseRoot
 
 type DatabaseRoot struct {
 	MongoClient *MongoClient
-	RedisClient *redis.Client
+	RedisClient *RedisClient
 	ScoreConfig *ScoreParams
 }
 
@@ -64,14 +61,15 @@ func GetMongo() (*MongoClient, error) {
 
 }
 
-func GetRedis() (*redis.Client, error) {
+func GetRedis() (*RedisClient, error) {
 
 	root, err := getRoot()
 	if err != nil {
 		return nil, err
 	}
 
-	client := root.RedisClient
+	client := root.RedisClient.Client
+
 	_, err = client.Ping().Result()
 	if err != nil {
 
@@ -82,7 +80,7 @@ func GetRedis() (*redis.Client, error) {
 
 	}
 
-	return client, nil
+	return root.RedisClient, nil
 }
 
 func GetScoreConfig() (*ScoreParams, error) {
@@ -103,7 +101,6 @@ func GetScoreConfig() (*ScoreParams, error) {
 
 }
 
-//TODO:
 func ReinitializeScoreConfig() error {
 	root, err := getRoot()
 	if err != nil {
@@ -116,120 +113,6 @@ func ReinitializeScoreConfig() error {
 	}
 
 	return nil
-}
-
-/*
-	Initializes the mongoDB Client to access databases and collections.
-*/
-
-func (root *DatabaseRoot) initRedisClient() error {
-
-	client := redis.NewClient(&redis.Options{
-		Addr:     getRedisURI(),
-		Password: "",
-		DB:       0,
-	})
-
-	_, err := client.Ping().Result()
-	if err != nil {
-		return err
-	}
-
-	root.RedisClient = client
-	log.Println("Initialized redis client!")
-
-	return nil
-
-}
-
-func (root *DatabaseRoot) initScoreConfig() error {
-
-	if root.RedisClient == nil {
-		return errors.New("redis client not initialized!")
-	}
-
-	redisClient, err := GetRedis()
-	if err != nil {
-		return err
-	}
-
-	followingK := GetScoreParam(redisClient, "following", "k")
-	followingW := GetScoreParam(redisClient, "following", "w")
-	followersK := GetScoreParam(redisClient, "followers", "k")
-	followersW := GetScoreParam(redisClient, "followers", "w")
-	gistsK := GetScoreParam(redisClient, "gists", "k")
-	gistsW := GetScoreParam(redisClient, "gists", "w")
-	issuesK := GetScoreParam(redisClient, "issues", "k")
-	issuesW := GetScoreParam(redisClient, "issues", "w")
-	organizationsK := GetScoreParam(redisClient, "organizations", "k")
-	organizationsW := GetScoreParam(redisClient, "organizations", "w")
-	projectsK := GetScoreParam(redisClient, "projects", "k")
-	projectsW := GetScoreParam(redisClient, "projects", "w")
-	pullRequestsK := GetScoreParam(redisClient, "pull_requests", "k")
-	pullRequestsW := GetScoreParam(redisClient, "pull_requests", "w")
-	contributionsK := GetScoreParam(redisClient, "contributions", "k")
-	contributionsW := GetScoreParam(redisClient, "contributions", "k")
-	starredK := GetScoreParam(redisClient, "starred", "k")
-	starredW := GetScoreParam(redisClient, "starred", "w")
-	watchingK := GetScoreParam(redisClient, "watching", "k")
-	watchingW := GetScoreParam(redisClient, "watching", "w")
-	commitCommentsK := GetScoreParam(redisClient, "commit_comments", "k")
-	commitCommentsW := GetScoreParam(redisClient, "commit_comments", "w")
-	gistCommentsK := GetScoreParam(redisClient, "gist_comments", "k")
-	gistCommentsW := GetScoreParam(redisClient, "gist_comments", "w")
-	issueCommentsK := GetScoreParam(redisClient, "issue_comments", "k")
-	issueCommentsW := GetScoreParam(redisClient, "issue_comments", "w")
-	reposK := GetScoreParam(redisClient, "repos", "k")
-	reposW := GetScoreParam(redisClient, "repos", "w")
-	commitFrequenzK := GetScoreParam(redisClient, "commit_frequenz", "k")
-	commitFrequenzW := GetScoreParam(redisClient, "commit_frequenz", "w")
-	stargazersK := GetScoreParam(redisClient, "stargazers", "k")
-	stargazersW := GetScoreParam(redisClient, "stargazers", "w")
-	forksK := GetScoreParam(redisClient, "forks", "k")
-	forksW := GetScoreParam(redisClient, "forks", "w")
-
-	scoreConfig := &ScoreParams{
-		FollowingK:      followingK,
-		FollowingW:      followingW,
-		FollowersK:      followersK,
-		FollowersW:      followersW,
-		GistsK:          gistsK,
-		GistsW:          gistsW,
-		IssuesK:         issuesK,
-		IssuesW:         issuesW,
-		OrganizationsK:  organizationsK,
-		OrganizationsW:  organizationsW,
-		ProjectsK:       projectsK,
-		ProjectsW:       projectsW,
-		PullRequestsK:   pullRequestsK,
-		PullRequestsW:   pullRequestsW,
-		ContributionsK:  contributionsK,
-		ContributionsW:  contributionsW,
-		StarredK:        starredK,
-		StarredW:        starredW,
-		Watchingk:       watchingK,
-		WatchingW:       watchingW,
-		CommitCommentsK: commitCommentsK,
-		CommitCommentsW: commitCommentsW,
-		GistCommentsK:   gistCommentsK,
-		GistCommentsW:   gistCommentsW,
-		IssueCommentsK:  issueCommentsK,
-		IssueCommentsW:  issueCommentsW,
-		ReposK:          reposK,
-		ReposW:          reposW,
-		CommitFrequenzK: commitFrequenzK,
-		CommitFrequenzW: commitFrequenzW,
-		StargazersK:     stargazersK,
-		StargazersW:     stargazersW,
-		ForksK:          forksK,
-		ForksW:          forksW,
-	}
-
-	root.ScoreConfig = scoreConfig
-	log.Println("Initialized score config!")
-
-	return nil
-
 }
 
 func getRoot() (*DatabaseRoot, error) {
@@ -255,9 +138,4 @@ func checkDbRoot() error {
 	}
 
 	return nil
-}
-
-func getRedisURI() (uri string) {
-	dbHost := os.Getenv("REDIS_HOST")
-	return dbHost
 }
