@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -110,31 +109,6 @@ func ReinitializeScoreConfig() error {
 	err = root.initScoreConfig()
 	if err != nil {
 		return err
-	}
-
-	return nil
-}
-
-func getRoot() (*DatabaseRoot, error) {
-
-	var err error
-
-	err = checkDbRoot()
-	if err != nil {
-		return nil, err
-	}
-
-	return dbRoot, nil
-
-}
-
-func checkDbRoot() error {
-
-	if dbRoot == nil {
-		err := Init()
-		if err != nil {
-			log.Println(err)
-		}
 	}
 
 	return nil
