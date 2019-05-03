@@ -30,10 +30,22 @@ func (client *MongoClient) getDefaultConfig() *MongoConfig {
 	}
 }
 
+func (client *MongoClient) getTestConfig() *MongoConfig {
+	return &MongoConfig{
+		MongoDatabaseName: "core_test",
+		MongoURI:          "mongodb://user:hd63gdf5df5g@localhost:27018/admin",
+	}
+}
+
 func (root *DatabaseRoot) initMongoClient() error {
 
 	mongoClient := &MongoClient{}
-	mongoClient.Config = mongoClient.getDefaultConfig()
+	switch root.Enviroment {
+	case ENV_TEST:
+		mongoClient.Config = mongoClient.getTestConfig()
+	default:
+		mongoClient.Config = mongoClient.getDefaultConfig()
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

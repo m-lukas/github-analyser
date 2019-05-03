@@ -7,18 +7,24 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
+const (
+	ENV_PROD = "ENV_PROD"
+	ENV_TEST = "ENV_TEST"
+)
+
 var dbRoot *DatabaseRoot
 
 type DatabaseRoot struct {
 	MongoClient *MongoClient
 	RedisClient *RedisClient
 	ScoreConfig *ScoreParams
+	Enviroment  string
 }
 
 func Init() error {
 	var err error
 
-	dbRoot = &DatabaseRoot{}
+	dbRoot = &DatabaseRoot{Enviroment: ENV_PROD}
 
 	err = dbRoot.initMongoClient()
 	if err != nil {
