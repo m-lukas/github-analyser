@@ -42,7 +42,7 @@ func readFile(filepath string) ([]string, error) {
 	return output, nil
 }
 
-func writeFile(filepath string, input []string) error {
+func WriteFile(filepath string, input []string) error {
 
 	file, err := os.Create(filepath)
 	if err != nil {
@@ -65,7 +65,7 @@ func writeFile(filepath string, input []string) error {
 	return nil
 }
 
-func readInputFiles(filepathes []string) ([]string, error) {
+func ReadInputFiles(filepathes []string) ([]string, error) {
 
 	var output []string
 
