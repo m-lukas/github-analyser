@@ -24,7 +24,7 @@ func Test_Files(t *testing.T) {
 		err = os.Remove(write_test)
 		assert.Nil(t, err)
 	})
-	t.Run("not able to read file", func(t *testing.T) {
+	t.Run("not able to read lines in file", func(t *testing.T) {
 		expected := []string{"hallo", "hello", "salut"}
 
 		output, err := readLines(read_test)
