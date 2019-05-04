@@ -8,7 +8,10 @@ import (
 func (root *DatabaseRoot) initScoreConfig() error {
 
 	if root.RedisClient == nil {
-		return errors.New("redis client not initialized!")
+		err := root.initRedisClient()
+		if err != nil {
+			return errors.New("redis client couldn't be reinitialized!")
+		}
 	}
 
 	redisClient, err := GetRedis()
