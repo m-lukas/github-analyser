@@ -17,6 +17,8 @@ func Test_Redis(t *testing.T) {
 	redisClient := root.RedisClient
 	require.NotNil(t, redisClient, "failed to initialize redis client")
 
+	require.Equal(t, redisClient.Config.Enviroment, ENV_TEST) //check for right db config
+
 	err = redisClient.Client.FlushDB().Err()
 	require.Nil(t, err, "flushing of database failed")
 

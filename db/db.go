@@ -2,12 +2,20 @@ package db
 
 import (
 	"context"
+	"errors"
 	"time"
+
+	"github.com/m-lukas/github-analyser/util"
 
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 var dbRoot *DatabaseRoot
+
+const (
+	ENV_PROD = "ENV_PROD"
+	ENV_TEST = "ENV_TEST"
+)
 
 type DatabaseRoot struct {
 	MongoClient *MongoClient
@@ -19,6 +27,10 @@ func Init() error {
 	var err error
 
 	dbRoot = &DatabaseRoot{}
+
+	if util.IsTesting() {
+		return errors.New("not available in testing enviroment")
+	}
 
 	err = dbRoot.initMongoClient()
 	if err != nil {

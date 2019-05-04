@@ -22,12 +22,14 @@ type MongoClient struct {
 type MongoConfig struct {
 	MongoDatabaseName string
 	MongoURI          string
+	Enviroment        string
 }
 
 func (client *MongoClient) getDefaultConfig() *MongoConfig {
 	return &MongoConfig{
 		MongoDatabaseName: os.Getenv("MONGO_DB"),
 		MongoURI:          getMongoURI(),
+		Enviroment:        ENV_PROD,
 	}
 }
 
@@ -35,6 +37,7 @@ func (client *MongoClient) getTestConfig() *MongoConfig {
 	return &MongoConfig{
 		MongoDatabaseName: "core_test",
 		MongoURI:          "mongodb://user:hd63gdf5df5g@localhost:27018/admin",
+		Enviroment:        ENV_TEST,
 	}
 }
 

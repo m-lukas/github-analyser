@@ -19,6 +19,7 @@ type RedisConfig struct {
 	URI        string
 	Password   string
 	DatabaseID int
+	Enviroment string
 }
 
 func (client *RedisClient) getDefaultConfig() *RedisConfig {
@@ -31,6 +32,7 @@ func (client *RedisClient) getDefaultConfig() *RedisConfig {
 		URI:        getRedisURI(),
 		Password:   os.Getenv("REDIS_PASS"),
 		DatabaseID: databaseID,
+		Enviroment: ENV_PROD,
 	}
 }
 
@@ -39,6 +41,7 @@ func (client *RedisClient) getTestConfig() *RedisConfig {
 		URI:        "localhost:6379",
 		Password:   "",
 		DatabaseID: 1,
+		Enviroment: ENV_TEST,
 	}
 }
 

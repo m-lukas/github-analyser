@@ -18,6 +18,8 @@ func Test_Mongo(t *testing.T) {
 	mongoClient := root.MongoClient
 	require.NotNil(t, mongoClient, "failed to initialize mongo client")
 
+	require.Equal(t, mongoClient.Config.Enviroment, ENV_TEST) //check for right db config
+
 	collectionName := "users_test"
 	err = mongoClient.Database.Collection(collectionName).Drop(context.Background())
 	require.Nil(t, err, "droping of collection failed")
