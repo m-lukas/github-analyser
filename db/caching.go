@@ -4,13 +4,12 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func CacheUser(user *User) error {
+func CacheUser(user *User, collectionName string) error {
 
 	client, err := GetMongo()
 	if err != nil {
 		return err
 	}
-	collectionName := "users"
 
 	dbUser, err := client.FindUser(user.Login, collectionName)
 	if dbUser != nil {

@@ -36,7 +36,7 @@ func GetUser(userName string) (*db.User, error) {
 	*/
 
 	go func(user *db.User) {
-		err = db.CacheUser(user)
+		err = db.CacheUser(user, "users")
 		if err != nil {
 			log.Println(err)
 		}

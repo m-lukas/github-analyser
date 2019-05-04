@@ -57,6 +57,10 @@ func GetMongo() (*MongoClient, error) {
 		return nil, err
 	}
 
+	if util.IsTesting() && root.MongoClient.Config.Enviroment != ENV_TEST {
+		return nil, errors.New("using production database while in testing")
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	err = root.MongoClient.Client.Ping(ctx, readpref.Primary())
@@ -77,6 +81,10 @@ func GetRedis() (*RedisClient, error) {
 	root, err := getRoot()
 	if err != nil {
 		return nil, err
+	}
+
+	if util.IsTesting() && root.RedisClient.Config.Enviroment != ENV_TEST {
+		return nil, errors.New("using production database while in testing")
 	}
 
 	client := root.RedisClient.Client
