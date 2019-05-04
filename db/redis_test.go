@@ -12,10 +12,18 @@ func Test_Redis(t *testing.T) {
 	var err error
 
 	root := &DatabaseRoot{}
-	err = root.initRedisClient()
-	require.Nil(t, err, "failed to initialize redis client")
-	redisClient := root.RedisClient
-	require.NotNil(t, redisClient, "failed to initialize redis client")
+	var redisClient *RedisClient
+
+	t.Run("redis initialization doesn't work", func(t *testing.T) {
+		err = root.initRedisClient()
+		require.Nil(t, err, "failed to initialize redis client")
+
+		redisClient = root.RedisClient
+		require.NotNil(t, redisClient, "failed to initialize redis client")
+
+		_, err = redisClient.Client.Ping().Result()
+		require.Nil(t, err, "initialized redis database not reachable")
+	})
 
 	require.Equal(t, redisClient.Config.Enviroment, ENV_TEST) //check for right db config
 

@@ -3,9 +3,11 @@ package db
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 func Test_Mongo(t *testing.T) {
@@ -13,10 +15,20 @@ func Test_Mongo(t *testing.T) {
 	var err error
 
 	root := &DatabaseRoot{}
-	err = root.initMongoClient()
-	require.Nil(t, err, "failed to initialize mongo client")
-	mongoClient := root.MongoClient
-	require.NotNil(t, mongoClient, "failed to initialize mongo client")
+	var mongoClient *MongoClient
+
+	t.Run("mongo initialization doesn't work", func(t *testing.T) {
+		err = root.initMongoClient()
+		require.Nil(t, err, "failed to initialize mongo client")
+
+		mongoClient = root.MongoClient
+		require.NotNil(t, mongoClient, "failed to initialize mongo client")
+
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		err = mongoClient.Client.Ping(ctx, readpref.Primary())
+		require.Nil(t, err, "initialized mongo database not reachable")
+	})
 
 	require.Equal(t, mongoClient.Config.Enviroment, ENV_TEST) //check for right db config
 
