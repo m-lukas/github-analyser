@@ -32,16 +32,28 @@ func (client *RedisClient) getDefaultConfig() *RedisConfig {
 	}
 }
 
+func (client *RedisClient) getTestConfig() *RedisConfig {
+	return &RedisConfig{
+		URI:        "localhost:6379",
+		Password:   "",
+		DatabaseID: 1,
+	}
+}
+
 func (root *DatabaseRoot) initRedisClient() error {
 
 	redisClient := &RedisClient{}
-	config := redisClient.getDefaultConfig()
-	redisClient.Config = config
+	switch root.Enviroment {
+	case ENV_TEST:
+		redisClient.Config = redisClient.getTestConfig()
+	default:
+		redisClient.Config = redisClient.getDefaultConfig()
+	}
 
 	client := redis.NewClient(&redis.Options{
-		Addr:     config.URI,
-		Password: config.Password,
-		DB:       config.DatabaseID,
+		Addr:     redisClient.Config.URI,
+		Password: redisClient.Config.Password,
+		DB:       redisClient.Config.DatabaseID,
 	})
 
 	_, err := client.Ping().Result()
