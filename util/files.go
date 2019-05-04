@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -19,7 +20,7 @@ func hasFileFormat(filepath string, format string) bool {
 	return true
 }
 
-func readFile(filepath string) ([]string, error) {
+func readLines(filepath string) ([]string, error) {
 
 	var output []string
 
@@ -75,7 +76,7 @@ func ReadInputFiles(filepathes []string) ([]string, error) {
 			return nil, errors.New("wrong file format")
 		}
 
-		content, err := readFile(filepath)
+		content, err := readLines(filepath)
 		if err != nil {
 			return nil, err
 		}
@@ -88,4 +89,14 @@ func ReadInputFiles(filepathes []string) ([]string, error) {
 	}
 
 	return output, nil
+}
+
+func ReadFile(path string) (string, error) {
+
+	data, err := ioutil.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+
+	return string(data), nil
 }

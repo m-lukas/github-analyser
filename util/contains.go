@@ -23,3 +23,18 @@ func BinaryContains(array []string, compare string) bool {
 
 	return false
 }
+
+func RemoveDuplicates(slice []string) []string {
+
+	keys := make(map[string]bool)
+	cleaned := []string{}
+
+	for _, value := range slice {
+		exists := keys[value]
+		if !exists {
+			keys[value] = true
+			cleaned = append(cleaned, value)
+		}
+	}
+	return cleaned
+}
