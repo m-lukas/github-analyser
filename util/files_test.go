@@ -14,6 +14,7 @@ const (
 )
 
 func Test_Files(t *testing.T) {
+
 	t.Run("not able to write file", func(t *testing.T) {
 		var err error
 
@@ -24,6 +25,7 @@ func Test_Files(t *testing.T) {
 		err = os.Remove(write_test)
 		assert.Nil(t, err)
 	})
+
 	t.Run("not able to read lines in file", func(t *testing.T) {
 		expected := []string{"hallo", "hello", "salut"}
 
@@ -32,12 +34,14 @@ func Test_Files(t *testing.T) {
 
 		assert.Equal(t, expected, output)
 	})
+
 	t.Run("doesn't recognise file format", func(t *testing.T) {
 		assert.True(t, hasFileFormat("./util/test/test_write.txt", "txt"))
 		assert.True(t, hasFileFormat("file.txt", "txt"))
 		assert.False(t, hasFileFormat("./something/image.png", "jpg"))
 		assert.True(t, hasFileFormat("./whatever/document.docx", "docx"))
 	})
+
 	t.Run("integration: failed to retrive input array", func(t *testing.T) {
 		var output []string
 		var err error
@@ -52,6 +56,15 @@ func Test_Files(t *testing.T) {
 
 		output, err = ReadInputFiles([]string{read_test, read_test})
 		assert.Nil(t, err)
+		assert.Equal(t, expected, output)
+	})
+
+	t.Run("not able to read file (query)", func(t *testing.T) {
+		expected := "hallo\nhello\nsalut"
+
+		output, err := ReadFile(read_test)
+		assert.Nil(t, err)
+
 		assert.Equal(t, expected, output)
 	})
 
