@@ -5,6 +5,8 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/m-lukas/github-analyser/util"
+
 	"github.com/go-redis/redis"
 )
 
@@ -43,10 +45,9 @@ func (client *RedisClient) getTestConfig() *RedisConfig {
 func (root *DatabaseRoot) initRedisClient() error {
 
 	redisClient := &RedisClient{}
-	switch root.Enviroment {
-	case ENV_TEST:
+	if util.IsTesting() {
 		redisClient.Config = redisClient.getTestConfig()
-	default:
+	} else {
 		redisClient.Config = redisClient.getDefaultConfig()
 	}
 

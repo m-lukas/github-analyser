@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/m-lukas/github-analyser/util"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -40,10 +41,9 @@ func (client *MongoClient) getTestConfig() *MongoConfig {
 func (root *DatabaseRoot) initMongoClient() error {
 
 	mongoClient := &MongoClient{}
-	switch root.Enviroment {
-	case ENV_TEST:
+	if util.IsTesting() {
 		mongoClient.Config = mongoClient.getTestConfig()
-	default:
+	} else {
 		mongoClient.Config = mongoClient.getDefaultConfig()
 	}
 
