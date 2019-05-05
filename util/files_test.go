@@ -1,9 +1,11 @@
-package util
+package util_test //black-box testing
 
 import (
 	"fmt"
 	"os"
 	"testing"
+
+	"github.com/m-lukas/github-analyser/util"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -18,7 +20,7 @@ func Test_Files(t *testing.T) {
 	t.Run("not able to write file", func(t *testing.T) {
 		var err error
 
-		err = WriteFile(write_test, []string{"test1", "test2", "test3"})
+		err = util.WriteFile(write_test, []string{"test1", "test2", "test3"})
 		fmt.Println(err)
 		assert.Nil(t, err)
 
@@ -29,17 +31,17 @@ func Test_Files(t *testing.T) {
 	t.Run("not able to read lines in file", func(t *testing.T) {
 		expected := []string{"hallo", "hello", "salut"}
 
-		output, err := readLines(read_test)
+		output, err := util.ReadLines(read_test)
 		assert.Nil(t, err)
 
 		assert.Equal(t, expected, output)
 	})
 
 	t.Run("doesn't recognise file format", func(t *testing.T) {
-		assert.True(t, hasFileFormat("./util/test/test_write.txt", "txt"))
-		assert.True(t, hasFileFormat("file.txt", "txt"))
-		assert.False(t, hasFileFormat("./something/image.png", "jpg"))
-		assert.True(t, hasFileFormat("./whatever/document.docx", "docx"))
+		assert.True(t, util.HasFileFormat("./util/test/test_write.txt", "txt"))
+		assert.True(t, util.HasFileFormat("file.txt", "txt"))
+		assert.False(t, util.HasFileFormat("./something/image.png", "jpg"))
+		assert.True(t, util.HasFileFormat("./whatever/document.docx", "docx"))
 	})
 
 	t.Run("integration: failed to retrive input array", func(t *testing.T) {
@@ -47,14 +49,14 @@ func Test_Files(t *testing.T) {
 		var err error
 		var expected = []string{"hallo", "hello", "salut"}
 
-		output, err = ReadInputFiles([]string{read_test})
+		output, err = util.ReadInputFiles([]string{read_test})
 		assert.Nil(t, err)
 		assert.Equal(t, expected, output)
 
-		output, err = ReadInputFiles([]string{read_test, "file_name.png"})
+		output, err = util.ReadInputFiles([]string{read_test, "file_name.png"})
 		assert.Error(t, err)
 
-		output, err = ReadInputFiles([]string{read_test, read_test})
+		output, err = util.ReadInputFiles([]string{read_test, read_test})
 		assert.Nil(t, err)
 		assert.Equal(t, expected, output)
 	})
@@ -62,7 +64,7 @@ func Test_Files(t *testing.T) {
 	t.Run("not able to read file (query)", func(t *testing.T) {
 		expected := "hallo\nhello\nsalut"
 
-		output, err := ReadFile(read_test)
+		output, err := util.ReadFile(read_test)
 		assert.Nil(t, err)
 
 		assert.Equal(t, expected, output)

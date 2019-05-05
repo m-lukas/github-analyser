@@ -1,9 +1,11 @@
-package util
+package util_test //black-box testing
 
 import (
 	"fmt"
 	"math/rand"
 	"testing"
+
+	"github.com/m-lukas/github-analyser/util"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -35,12 +37,12 @@ func Test_Contains(t *testing.T) {
 
 	t.Run("normal: contains", func(t *testing.T) {
 		for _, test := range testTable {
-			assert.Equal(t, test.Output, Contains(test.Slice, test.Query))
+			assert.Equal(t, test.Output, util.Contains(test.Slice, test.Query))
 		}
 	})
 	t.Run("binary: contains", func(t *testing.T) {
 		for _, test := range testTable {
-			assert.Equal(t, test.Output, BinaryContains(test.Slice, test.Query))
+			assert.Equal(t, test.Output, util.BinaryContains(test.Slice, test.Query))
 		}
 	})
 }
@@ -50,12 +52,12 @@ func Benchmark_Contains(b *testing.B) {
 
 	b.Run("normal: benchmark", func(b *testing.B) {
 		for n := 0; n < b.N; n++ {
-			Contains(slice, contained)
+			util.Contains(slice, contained)
 		}
 	})
 	b.Run("binary: benchmark", func(b *testing.B) {
 		for n := 0; n < b.N; n++ {
-			BinaryContains(slice, contained)
+			util.BinaryContains(slice, contained)
 		}
 	})
 }

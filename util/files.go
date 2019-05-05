@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func hasFileFormat(filepath string, format string) bool {
+func HasFileFormat(filepath string, format string) bool {
 	subStrings := strings.Split(filepath, ".")
 	ending := subStrings[len(subStrings)-1]
 
@@ -20,7 +20,7 @@ func hasFileFormat(filepath string, format string) bool {
 	return true
 }
 
-func readLines(filepath string) ([]string, error) {
+func ReadLines(filepath string) ([]string, error) {
 
 	var output []string
 
@@ -72,11 +72,11 @@ func ReadInputFiles(filepathes []string) ([]string, error) {
 
 	for _, filepath := range filepathes {
 
-		if !hasFileFormat(filepath, "txt") {
+		if !HasFileFormat(filepath, "txt") {
 			return nil, errors.New("wrong file format")
 		}
 
-		content, err := readLines(filepath)
+		content, err := ReadLines(filepath)
 		if err != nil {
 			return nil, err
 		}

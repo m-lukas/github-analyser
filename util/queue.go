@@ -1,15 +1,15 @@
 package util
 
 type Queue struct {
-	elements []interface{}
+	Elements []interface{}
 }
 
 func (queue *Queue) Push(elem interface{}) {
-	queue.elements = append(queue.elements, elem)
+	queue.Elements = append(queue.Elements, elem)
 }
 
 func (queue *Queue) Pop() interface{} {
 	var elem interface{}
-	elem, queue.elements = queue.elements[0], queue.elements[1:]
+	elem, queue.Elements = queue.Elements[0], queue.Elements[1:]
 	return elem
 }
