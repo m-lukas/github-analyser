@@ -2,6 +2,8 @@ package graphql
 
 import (
 	"errors"
+
+	"github.com/m-lukas/github-analyser/util"
 )
 
 type PopulatingDataRaw struct {
@@ -139,7 +141,7 @@ func GetLoginList(rawData *PopulatingDataRaw) []string {
 		}
 	}
 
-	uniqueList := removeDuplicates(loginList)
+	uniqueList := util.RemoveDuplicates(loginList)
 
 	return uniqueList
 

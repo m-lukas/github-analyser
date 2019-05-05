@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/m-lukas/github-analyser/util"
 )
 
 type Client struct {
@@ -121,11 +123,11 @@ func (c *Client) run(ctx context.Context, request *Request, responseData interfa
 
 }
 
-func query(userName string, query string, object interface{}) error {
+func query(userName string, queryPath string, object interface{}) error {
 
 	client := newClient("https://api.github.com/graphql", nil)
 
-	query, err := readQuery(query)
+	query, err := util.ReadFile(queryPath)
 	if err != nil {
 		return err
 	}

@@ -3,6 +3,8 @@ package graphql
 import (
 	"errors"
 	"time"
+
+	"github.com/m-lukas/github-analyser/util"
 )
 
 type CommitDataRaw struct {
@@ -59,7 +61,7 @@ func GetCommitData(userName string) CommitDataResponse {
 
 func convertCommitData(rawData *CommitDataRaw) *CommitData {
 
-	commitFrequenz := GetCommitFrequenz(rawData)
+	commitFrequenz := GetCommitFrequenz(rawData, time.Now())
 
 	convertedCommitData := &CommitData{
 		CommitFrequenz: commitFrequenz,
@@ -69,7 +71,7 @@ func convertCommitData(rawData *CommitDataRaw) *CommitData {
 
 }
 
-func GetCommitFrequenz(rawCommitData *CommitDataRaw) float64 {
+func GetCommitFrequenz(rawCommitData *CommitDataRaw, today time.Time) float64 {
 
 	var commitDates dateSlice
 	var commitTimeDifferences []float64
@@ -85,12 +87,18 @@ func GetCommitFrequenz(rawCommitData *CommitDataRaw) float64 {
 			commitDates = append(commitDates, commitDate)
 
 		}
+	}
 
+	if len(commitDates) < 1 {
+		return -1.0
 	}
 
 	commitDates = sortDatesAsc(commitDates)
-
 	var maxCheckedItems int
+
+	recentCommitDate := commitDates[len(commitDates)-1]
+	hoursDiff := getHoursDifference(today, recentCommitDate)
+	commitTimeDifferences = append(commitTimeDifferences, hoursDiff)
 
 	for index := len(commitDates) - 1; index > 0; index-- {
 
@@ -103,15 +111,18 @@ func GetCommitFrequenz(rawCommitData *CommitDataRaw) float64 {
 		commitDate := commitDates[index]
 		commitDateBefore := commitDates[index-1]
 
-		timeDiff := commitDate.Sub(commitDateBefore)
-		hoursDiff := timeDiff.Hours()
-
+		hoursDiff = getHoursDifference(commitDate, commitDateBefore)
 		commitTimeDifferences = append(commitTimeDifferences, hoursDiff)
-
 	}
 
-	frequenz := avg(commitTimeDifferences)
+	frequenz := util.Avg(commitTimeDifferences)
 
 	return frequenz
 
+}
+
+func getHoursDifference(endDate time.Time, startDate time.Time) float64 {
+	timeDiff := endDate.Sub(startDate)
+	hoursDiff := timeDiff.Hours()
+	return hoursDiff
 }
