@@ -45,7 +45,7 @@ func (client *RedisClient) getTestConfig() *RedisConfig {
 	}
 }
 
-func (root *DatabaseRoot) initRedisClient() error {
+func (root *DatabaseRoot) InitRedisClient() error {
 
 	redisClient := &RedisClient{}
 	if util.IsTesting() {

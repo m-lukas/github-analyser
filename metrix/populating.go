@@ -87,7 +87,7 @@ func queryUserData(inputArray []string) []*db.User {
 				if resp.Error != nil {
 					fmt.Printf("%s %d/%d Failed to get data of user: %s\n", prefix, numberOfResponses, queryLength, resp.Login)
 					fmt.Printf("%s %d/%d Trying to get user data from cache for: %s\n", prefix, numberOfResponses, queryLength, resp.Login)
-					dbData, err := getUserFromCache(resp.Login)
+					dbData, err := controller.GetUserFromCache(resp.Login)
 					if err != nil {
 						fmt.Printf("%s %d/%d Failed to get data of user: %s\n", prefix, numberOfResponses, queryLength, resp.Login)
 					} else {

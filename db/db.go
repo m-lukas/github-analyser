@@ -11,6 +11,7 @@ import (
 )
 
 var dbRoot *DatabaseRoot
+var TestRoot *DatabaseRoot
 
 const (
 	ENV_PROD = "ENV_PROD"
@@ -32,17 +33,17 @@ func Init() error {
 		return errors.New("not available in testing enviroment")
 	}
 
-	err = dbRoot.initMongoClient()
+	err = dbRoot.InitMongoClient()
 	if err != nil {
 		return err
 	}
 
-	err = dbRoot.initRedisClient()
+	err = dbRoot.InitRedisClient()
 	if err != nil {
 		return err
 	}
 
-	err = dbRoot.initScoreConfig()
+	err = dbRoot.InitScoreConfig()
 	if err != nil {
 		return err
 	}
@@ -51,7 +52,6 @@ func Init() error {
 }
 
 func GetMongo() (*MongoClient, error) {
-
 	root, err := getRoot()
 	if err != nil {
 		return nil, err
@@ -65,7 +65,7 @@ func GetMongo() (*MongoClient, error) {
 	defer cancel()
 	err = root.MongoClient.Client.Ping(ctx, readpref.Primary())
 	if err != nil {
-		err := root.initMongoClient()
+		err := root.InitMongoClient()
 		if err != nil {
 			return nil, err
 		}
@@ -92,7 +92,7 @@ func GetRedis() (*RedisClient, error) {
 	_, err = client.Ping().Result()
 	if err != nil {
 
-		err = root.initRedisClient()
+		err = root.InitRedisClient()
 		if err != nil {
 			return nil, err
 		}
@@ -110,7 +110,7 @@ func GetScoreConfig() (*ScoreParams, error) {
 	}
 
 	if root.ScoreConfig == nil {
-		err := root.initScoreConfig()
+		err := root.InitScoreConfig()
 		if err != nil {
 			return nil, err
 		}
@@ -126,7 +126,7 @@ func ReinitializeScoreConfig() error {
 		return err
 	}
 
-	err = root.initScoreConfig()
+	err = root.InitScoreConfig()
 	if err != nil {
 		return err
 	}

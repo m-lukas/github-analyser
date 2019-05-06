@@ -2,7 +2,6 @@ package controller
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/m-lukas/github-analyser/db"
@@ -32,7 +31,6 @@ func fetchUser(userName string) (*db.User, error) {
 		case resp := <-generalChannel:
 
 			if resp.Error != nil {
-				fmt.Printf("General: %v", resp.Error)
 				return nil, resp.Error
 			} else {
 				generalData = resp.Data
@@ -41,7 +39,6 @@ func fetchUser(userName string) (*db.User, error) {
 		case resp := <-commitChannel:
 
 			if resp.Error != nil {
-				fmt.Printf("Commit: %v", resp.Error)
 				return nil, resp.Error
 			} else {
 				commitData = resp.Data

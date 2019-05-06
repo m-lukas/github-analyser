@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/m-lukas/github-analyser/controller"
 	"github.com/m-lukas/github-analyser/db"
 	"github.com/m-lukas/github-analyser/util"
 )
@@ -54,7 +55,7 @@ func CalcScoreParams() error {
 
 	}
 
-	err = save(dbPairs, "k")
+	err = controller.SaveConfigValues(dbPairs, "k")
 	if err != nil {
 		return err
 	}
@@ -68,7 +69,7 @@ func CalcScoreParams() error {
 
 	fmt.Printf("%s Reinitialized score config!\n", prefix)
 
-	err = updateExisting()
+	err = controller.UpdateAllScores()
 	if err != nil {
 		return err
 	}

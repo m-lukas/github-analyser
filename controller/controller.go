@@ -13,7 +13,7 @@ func GetUser(userName string) (*db.User, error) {
 
 	user, err := fetchUser(userName)
 	if err != nil {
-		return nil, err
+
 	}
 
 	if user.Login == "" {
@@ -25,10 +25,7 @@ func GetUser(userName string) (*db.User, error) {
 		return nil, err
 	}
 
-	user.Scores = CalcScores(user, config)
-
-	user.ActivityScore = CalcActivityScore(user.Scores, config)
-	user.PopularityScore = CalcPopularityScore(user.Scores, config)
+	SetScore(user, config)
 
 	go func(user *db.User) {
 		err = CacheUser(user, "users")

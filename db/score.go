@@ -5,10 +5,10 @@ import (
 	"log"
 )
 
-func (root *DatabaseRoot) initScoreConfig() error {
+func (root *DatabaseRoot) InitScoreConfig() error {
 
 	if root.RedisClient == nil {
-		err := root.initRedisClient()
+		err := root.InitRedisClient()
 		if err != nil {
 			return errors.New("redis client couldn't be reinitialized!")
 		}

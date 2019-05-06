@@ -29,3 +29,20 @@ func CacheUser(user *db.User, collectionName string) error {
 
 	return nil
 }
+
+func GetUserFromCache(login string) (*db.User, error) {
+
+	mongoClient, err := db.GetMongo()
+	if err != nil {
+		return nil, err
+	}
+	collectionName := "users"
+
+	dbUser, err := mongoClient.FindUser(login, collectionName)
+	if err != nil {
+		return nil, err
+	}
+
+	return dbUser, nil
+
+}

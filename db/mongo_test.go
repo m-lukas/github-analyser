@@ -18,7 +18,7 @@ func Test_Mongo(t *testing.T) {
 	var mongoClient *MongoClient
 
 	t.Run("mongo initialization doesn't work", func(t *testing.T) {
-		err = root.initMongoClient()
+		err = root.InitMongoClient()
 		require.Nil(t, err, "failed to initialize mongo client")
 
 		mongoClient = root.MongoClient

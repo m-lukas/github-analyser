@@ -28,7 +28,7 @@ func Test_DB(t *testing.T) {
 	dbRoot = &DatabaseRoot{}
 
 	t.Run("doesn't retrieve root properly", func(t *testing.T) {
-		root, err := getRoot()
+		root, err := getDefaultRoot()
 		require.Nil(t, err)
 		assert.Equal(t, dbRoot, root)
 	})

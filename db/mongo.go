@@ -41,7 +41,7 @@ func (client *MongoClient) getTestConfig() *MongoConfig {
 	}
 }
 
-func (root *DatabaseRoot) initMongoClient() error {
+func (root *DatabaseRoot) InitMongoClient() error {
 
 	mongoClient := &MongoClient{}
 	if util.IsTesting() {

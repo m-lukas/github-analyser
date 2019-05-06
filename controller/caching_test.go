@@ -5,6 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/m-lukas/github-analyser/db"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.mongodb.org/mongo-driver/bson"
@@ -15,9 +17,9 @@ func Test_Caching(t *testing.T) {
 
 	var err error
 
-	dbRoot = &DatabaseRoot{}
+	db.TestRoot = &db.DatabaseRoot{}
 
-	testUser := &User{
+	testUser := &db.User{
 		Login:         "m-lukas",
 		Name:          "Lukas Müller",
 		Location:      "Berlin",
@@ -25,12 +27,12 @@ func Test_Caching(t *testing.T) {
 		ActivityScore: 50.001,
 	}
 
-	err = dbRoot.initMongoClient()
+	err = db.TestRoot.InitMongoClient()
 	require.Nil(t, err)
 
-	mongoClient := dbRoot.MongoClient
+	mongoClient := db.TestRoot.MongoClient
 
-	require.Equal(t, mongoClient.Config.Enviroment, ENV_TEST) //check for right db config
+	require.Equal(t, mongoClient.Config.Enviroment, db.ENV_TEST) //check for right db config
 
 	collectionName := "users_test"
 	collection := mongoClient.Database.Collection(collectionName)
@@ -52,7 +54,7 @@ func Test_Caching(t *testing.T) {
 		assert.Nil(t, err, "mongo internal: failed to count documents")
 		assert.Equal(t, int64(1), count, "didn't update existing user")
 
-		var dbUser User
+		var dbUser db.User
 
 		err = collection.FindOne(ctx, bson.M{}).Decode(&dbUser)
 		assert.Nil(t, err, "failed to get user from database")
@@ -62,5 +64,5 @@ func Test_Caching(t *testing.T) {
 	err = collection.Drop(context.Background())
 	assert.Nil(t, err, "droping of collection failed")
 
-	dbRoot = nil
+	db.TestRoot = nil
 }

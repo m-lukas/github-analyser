@@ -15,7 +15,7 @@ func Test_Redis(t *testing.T) {
 	var redisClient *RedisClient
 
 	t.Run("redis initialization doesn't work", func(t *testing.T) {
-		err = root.initRedisClient()
+		err = root.InitRedisClient()
 		require.Nil(t, err, "failed to initialize redis client")
 
 		redisClient = root.RedisClient
