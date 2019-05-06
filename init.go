@@ -9,7 +9,7 @@ import (
 )
 
 func setupInit() {
-	err := setup.SetupInputFile("sindresorhus")
+	err := setup.SetupInputFile("jo-fr")
 	if err != nil {
 		log.Fatal(err)
 	}

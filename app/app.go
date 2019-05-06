@@ -24,8 +24,9 @@ func InitRouter(apiPath string) *chi.Mux {
 		},
 	)
 
-	return router
+	InitUserRoutes(router)
 
+	return router
 }
 
 func HandleCors(h http.Handler) http.Handler {

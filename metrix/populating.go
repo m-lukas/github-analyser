@@ -48,10 +48,6 @@ func queryUserData(inputArray []string) []*db.User {
 
 	for {
 
-		if numberOfResponses == 100 {
-			return queriedUsers
-		}
-
 		var block []string
 
 		inputArray, block = util.PopN(inputArray, blockSize)

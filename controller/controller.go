@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/m-lukas/github-analyser/db"
@@ -14,6 +15,11 @@ func GetUser(userName string) (*db.User, error) {
 	user, err := fetchUser(userName)
 	if err != nil {
 
+		fmt.Println("Trying to retrieve user from cache.")
+		user, err = GetUserFromCache(userName)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if user.Login == "" {
@@ -35,5 +41,4 @@ func GetUser(userName string) (*db.User, error) {
 	}(user)
 
 	return user, nil
-
 }
