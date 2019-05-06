@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,8 +10,9 @@ import (
 	"time"
 
 	"github.com/go-chi/chi"
+	"github.com/m-lukas/github-analyser/app"
 	"github.com/m-lukas/github-analyser/db"
-	"github.com/m-lukas/github-analyser/metrix"
+	"github.com/m-lukas/github-analyser/util"
 
 	"github.com/joho/godotenv"
 )
@@ -78,36 +80,35 @@ func init() {
 
 func main() {
 
+	env := os.Getenv("ENV")
+	setupFlag := util.ReadBoolFlag("FLAG_DO_SETUP")
+	metrixFlag := util.ReadBoolFlag("FLAG_DO_METRIX")
+
+	flag.String("enviroment", env, "Possible values: <dev|prod>")
+
 	err := db.Init()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	/*
-		err = setup.SetupInputFile("sindresorhus")
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println("written successfully")
-	*/
-
-	err = metrix.CalcScoreParams()
-	if err != nil {
-		log.Fatal(err)
+	if setupFlag {
+		setupInit()
+	}
+	if metrixFlag {
+		metrixInit()
 	}
 
-	/*
-		server := &Server{
-			Config: defaultServerConfig(),
-		}
+	server := &Server{
+		Config: defaultServerConfig(),
+	}
 
-		server.Router = app.InitRouter(server.Config.APIPath)
+	server.Router = app.InitRouter(server.Config.APIPath)
 
-		handler := app.HandleCors(server.Router)
-		server.HTTPServer = configHTTPServer(server.Config, handler)
+	handler := app.HandleCors(server.Router)
+	server.HTTPServer = configHTTPServer(server.Config, handler)
 
-		log.Println("Server has been configurated!")
+	log.Println("Server has been configurated!")
 
-		runServer(server)
-	*/
+	runServer(server)
+
 }

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/m-lukas/github-analyser/db"
+	"github.com/m-lukas/github-analyser/util"
 )
 
 const (
@@ -32,9 +33,9 @@ const (
 func CalcScoreParams() error {
 
 	startTime := time.Now()
-	fmt.Printf("%s Start time: %s\n", prefix, formatDuration(time.Since(startTime)))
+	fmt.Printf("%s Start time: %s\n", prefix, util.FormatDuration(time.Since(startTime)))
 
-	inputFiles := []string{"./metrix/input/users.txt"}
+	inputFiles := []string{"./metrix/input/sindresorhus.txt"}
 	userArray, err := populateData(inputFiles)
 	if err != nil {
 		return err
@@ -74,7 +75,7 @@ func CalcScoreParams() error {
 
 	fmt.Printf("%s FINISHED!\n", prefix)
 
-	fmt.Printf("%s End time: %s\n", prefix, formatDuration(time.Since(startTime)))
+	fmt.Printf("%s End time: %s\n", prefix, util.FormatDuration(time.Since(startTime)))
 
 	return nil
 

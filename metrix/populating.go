@@ -54,7 +54,7 @@ func queryUserData(inputArray []string) []*db.User {
 
 		var block []string
 
-		inputArray, block = popN(inputArray, blockSize)
+		inputArray, block = util.PopN(inputArray, blockSize)
 		if len(block) == 0 {
 			break
 		}
@@ -86,16 +86,14 @@ func queryUserData(inputArray []string) []*db.User {
 				numberOfResponses++
 				if resp.Error != nil {
 					fmt.Printf("%s %d/%d Failed to get data of user: %s\n", prefix, numberOfResponses, queryLength, resp.Login)
-					/*
-						fmt.Printf("%s %d/%d Trying to get user data from cache for: %s\n", prefix, numberOfResponses, queryLength, resp.Login)
-						dbData, err := getUserFromCache(resp.Login)
-						if err != nil {
-							fmt.Printf("%s %d/%d Failed to get data of user: %s\n", prefix, numberOfResponses, queryLength, resp.Login)
-						} else {
-							querySuccessMessage(resp.Login, startTime, numberOfResponses, queryLength)
-							queriedUsers = append(queriedUsers, dbData)
-						}
-					*/
+					fmt.Printf("%s %d/%d Trying to get user data from cache for: %s\n", prefix, numberOfResponses, queryLength, resp.Login)
+					dbData, err := getUserFromCache(resp.Login)
+					if err != nil {
+						fmt.Printf("%s %d/%d Failed to get data of user: %s\n", prefix, numberOfResponses, queryLength, resp.Login)
+					} else {
+						querySuccessMessage(resp.Login, startTime, numberOfResponses, queryLength)
+						queriedUsers = append(queriedUsers, dbData)
+					}
 				} else {
 					querySuccessMessage(resp.Login, startTime, numberOfResponses, queryLength)
 					queriedUsers = append(queriedUsers, resp.User)
@@ -108,7 +106,7 @@ func queryUserData(inputArray []string) []*db.User {
 
 			if numberOfResponse == blockSize {
 				fmt.Printf("%s --- COOLDOWN: %ds ---\n", prefix, cooldown)
-				fmt.Printf("%s --- TIME: %s ---\n", prefix, formatDuration(time.Since(startTime)))
+				fmt.Printf("%s --- TIME: %s ---\n", prefix, util.FormatDuration(time.Since(startTime)))
 				break
 			}
 
@@ -125,22 +123,5 @@ func queryUserData(inputArray []string) []*db.User {
 }
 
 func querySuccessMessage(login string, startTime time.Time, n int, overall int) {
-	fmt.Printf("%s %d/%d User: %s, Time: %s\n", prefix, n, overall, login, formatDuration(time.Since(startTime)))
-}
-
-func getUserFromCache(login string) (*db.User, error) {
-
-	mongo, err := db.GetMongo()
-	if err != nil {
-		return nil, err
-	}
-	collection := mongo.Collection("users")
-
-	dbUser, err := db.FindUser(login, collection)
-	if err != nil {
-		return nil, err
-	}
-
-	return dbUser, nil
-
+	fmt.Printf("%s %d/%d User: %s, Time: %s\n", prefix, n, overall, login, util.FormatDuration(time.Since(startTime)))
 }

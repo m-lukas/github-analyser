@@ -10,14 +10,14 @@ import (
 
 func save(pairs map[string]interface{}, field string) error {
 
-	client, err := db.GetRedis()
+	redisClient, err := db.GetRedis()
 	if err != nil {
 		return err
 	}
 
 	for key, value := range pairs {
 
-		err = db.RedisHashInsert(client, key, field, value)
+		err = redisClient.HashInsert(key, field, value)
 		if err != nil {
 			return err
 		}
@@ -25,18 +25,17 @@ func save(pairs map[string]interface{}, field string) error {
 	}
 
 	return nil
-
 }
 
 func updateExisting() error {
 
-	mongo, err := db.GetMongo()
+	mongoClient, err := db.GetMongo()
 	if err != nil {
 		return err
 	}
-	collection := mongo.Collection("users")
+	collectionName := "users"
 
-	userArray, err := db.FindAllUsers(collection)
+	userArray, err := mongoClient.FindAllUsers(collectionName)
 	if err != nil {
 		return err
 	}
@@ -54,7 +53,7 @@ func updateExisting() error {
 		user.PopularityScore = controller.CalcPopularityScore(user.Scores, scoreConfig)
 
 		filter := bson.D{{"login", user.Login}}
-		err = db.UpdateAll(filter, user, collection)
+		err = mongoClient.UpdateAll(filter, user, collectionName)
 		if err != nil {
 			return err
 		}
@@ -64,5 +63,22 @@ func updateExisting() error {
 	}
 
 	return nil
+
+}
+
+func getUserFromCache(login string) (*db.User, error) {
+
+	mongoClient, err := db.GetMongo()
+	if err != nil {
+		return nil, err
+	}
+	collectionName := "users"
+
+	dbUser, err := mongoClient.FindUser(login, collectionName)
+	if err != nil {
+		return nil, err
+	}
+
+	return dbUser, nil
 
 }

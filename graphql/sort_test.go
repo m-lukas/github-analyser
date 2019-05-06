@@ -20,10 +20,10 @@ func Test_Sort(t *testing.T) {
 	date3 := dateTime.Add(+2*24*time.Hour + 20*time.Hour + 42*time.Minute)
 
 	testTable := []dateSlice{
-		dateSlice{date2, date3, date1},
-		dateSlice{date3, date1, date2},
-		dateSlice{date3, date2, date1},
-		dateSlice{date1, date2, date3},
+		{date2, date3, date1},
+		{date3, date1, date2},
+		{date3, date2, date1},
+		{date1, date2, date3},
 	}
 
 	t.Run("sort date slice ascending", func(t *testing.T) {

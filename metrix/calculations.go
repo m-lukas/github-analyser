@@ -5,6 +5,7 @@ import (
 	"sort"
 
 	"github.com/m-lukas/github-analyser/db"
+	"github.com/m-lukas/github-analyser/util"
 )
 
 const (
@@ -28,7 +29,7 @@ func calcK(users []*db.User, fieldType string) float64 {
 	midValue := getNearestToAvgValue(valueArray)
 	if midValue == 0.0 {
 
-		biggestValue := biggestValueSorted(valueArray)
+		biggestValue := util.BiggestValueSorted(valueArray)
 
 		k := calcKFromY(99.9999, biggestValue)
 		return k
@@ -86,7 +87,7 @@ func getField(user *db.User, fieldType string) float64 {
 
 func getNearestToAvgValue(valueArray []float64) float64 {
 
-	average := avg(valueArray)
+	average := util.Avg(valueArray)
 
 	midIndex := int(math.Round(float64(len(valueArray) / 2)))
 	midValue := valueArray[midIndex]
@@ -189,9 +190,9 @@ func compareDistanceLoop(valueArray []float64, startIndex int, endIndex int, dir
 
 func nearestDistance(target float64, first float64, second float64, third float64) float64 {
 
-	distanceFromFirst := distanceToNumber(first, target)
-	distanceFromSecond := distanceToNumber(second, target)
-	distanceFromThird := distanceToNumber(third, target)
+	distanceFromFirst := util.DistanceToNumber(first, target)
+	distanceFromSecond := util.DistanceToNumber(second, target)
+	distanceFromThird := util.DistanceToNumber(third, target)
 
 	if distanceFromSecond > distanceFromFirst {
 		return first
