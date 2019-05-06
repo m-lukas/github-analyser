@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/m-lukas/github-analyser/controller"
+	"github.com/m-lukas/github-analyser/db"
 
 	"bitbucket.org/timbertom/backend/httputil"
 	"bitbucket.org/timbertom/backend/translate"
@@ -29,5 +30,19 @@ func doGetScore(userName string) (*scoreResponse, *httputil.ErrorResponse) {
 	}
 
 	return resp, nil
+}
+
+func doGetUser(userName string) (*db.User, *httputil.ErrorResponse) {
+
+	if userName == "" {
+		return nil, httputil.FromTranslationKey(400, translate.MissingParameter)
+	}
+
+	user, err := controller.GetUser(userName)
+	if err != nil {
+		return nil, httputil.FromTranslationKey(500, translate.ServerError)
+	}
+
+	return user, nil
 
 }
