@@ -17,6 +17,7 @@ func Test_Mongo(t *testing.T) {
 	root := &DatabaseRoot{}
 	var mongoClient *MongoClient
 
+	//root.InitMongoClient()
 	t.Run("mongo initialization doesn't work", func(t *testing.T) {
 		err = root.InitMongoClient()
 		require.Nil(t, err, "failed to initialize mongo client")
@@ -33,7 +34,7 @@ func Test_Mongo(t *testing.T) {
 	require.Equal(t, mongoClient.Config.Enviroment, ENV_TEST) //check for right db config
 
 	collectionName := "users_test"
-	err = mongoClient.Database.Collection(collectionName).Drop(context.Background())
+	err = mongoClient.Database.Collection(collectionName).Drop(context.Background()) //drop test collection
 	require.Nil(t, err, "droping of collection failed")
 
 	testSlice := []*User{
@@ -60,6 +61,7 @@ func Test_Mongo(t *testing.T) {
 		},
 	}
 
+	//test all mongo functions
 	t.Run("database functionality test", func(t *testing.T) {
 		for _, user := range testSlice {
 			err := mongoClient.Insert(user, collectionName)
@@ -88,6 +90,6 @@ func Test_Mongo(t *testing.T) {
 		require.Equal(t, len(testSlice), len(userSlice))
 	})
 
-	err = mongoClient.Database.Collection(collectionName).Drop(context.Background())
+	err = mongoClient.Database.Collection(collectionName).Drop(context.Background()) //drop test collection
 	require.Nil(t, err, "droping of collection failed")
 }

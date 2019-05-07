@@ -9,23 +9,23 @@ import (
 
 func Test_DB(t *testing.T) {
 
-	var err error
-
-	dbRoot = &DatabaseRoot{}
+	TestRoot = &DatabaseRoot{}
 
 	t.Run("root check reinitializes existing root", func(t *testing.T) {
-		err = checkDbRoot()
+		root, err := checkDbRoot()
+		require.Nil(t, root)
+		require.NotNil(t, err)
+	})
+
+	TestRoot = nil
+
+	t.Run("root check doesn't initialize non-existing root", func(t *testing.T) {
+		root, err := checkDbRoot()
+		require.NotNil(t, root)
 		require.Nil(t, err)
 	})
 
-	dbRoot = nil
-
-	t.Run("root check doesn't initialize non-existing root", func(t *testing.T) {
-		err = checkDbRoot()
-		require.Error(t, err)
-	})
-
-	dbRoot = &DatabaseRoot{}
+	TestRoot = &DatabaseRoot{}
 
 	t.Run("doesn't retrieve root properly", func(t *testing.T) {
 		root, err := getDefaultRoot()
@@ -33,6 +33,6 @@ func Test_DB(t *testing.T) {
 		assert.Equal(t, dbRoot, root)
 	})
 
-	dbRoot = nil
+	TestRoot = nil
 
 }

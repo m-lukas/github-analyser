@@ -13,18 +13,21 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
+//MongoClient contains the mongo db client, its config and the default database
 type MongoClient struct {
 	Client   *mongo.Client
 	Database *mongo.Database
 	Config   *MongoConfig
 }
 
+//MongoConfig contains config to init mongo db client
 type MongoConfig struct {
 	MongoDatabaseName string
 	MongoURI          string
 	Enviroment        string
 }
 
+//getDefaultConfig return config in dev/prod
 func (client *MongoClient) getDefaultConfig() *MongoConfig {
 	return &MongoConfig{
 		MongoDatabaseName: os.Getenv("MONGO_DB"),
@@ -33,6 +36,7 @@ func (client *MongoClient) getDefaultConfig() *MongoConfig {
 	}
 }
 
+//getTestConfig return config in test
 func (client *MongoClient) getTestConfig() *MongoConfig {
 	return &MongoConfig{
 		MongoDatabaseName: "core_test",
@@ -41,27 +45,33 @@ func (client *MongoClient) getTestConfig() *MongoConfig {
 	}
 }
 
+//InitMongoClient establishes a connection to the mongoDB instance
 func (root *DatabaseRoot) InitMongoClient() error {
 
 	mongoClient := &MongoClient{}
+	//use config according to the enviroment
 	if util.IsTesting() {
 		mongoClient.Config = mongoClient.getTestConfig()
 	} else {
 		mongoClient.Config = mongoClient.getDefaultConfig()
 	}
 
+	//add timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	//try to establish connection to mongoDB Instance
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoClient.Config.MongoURI))
 	if err != nil {
 		return err
 	}
+	//ping instance, return err if not reachable
 	err = client.Ping(ctx, readpref.Primary())
 	if err != nil {
 		return err
 	}
 
+	//add client and default database to struct
 	mongoClient.Client = client
 	mongoClient.Database = client.Database(mongoClient.Config.MongoDatabaseName)
 

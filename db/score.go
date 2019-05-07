@@ -5,8 +5,11 @@ import (
 	"log"
 )
 
+//InitScoreConfig retrieves the ScoreParams from redis and assigns it to the database root.
+//Initializes root and redis client if nil.
 func (root *DatabaseRoot) InitScoreConfig() error {
 
+	//check redis client
 	if root.RedisClient == nil {
 		err := root.InitRedisClient()
 		if err != nil {
@@ -14,11 +17,13 @@ func (root *DatabaseRoot) InitScoreConfig() error {
 		}
 	}
 
+	//get redis client
 	redisClient, err := GetRedis()
 	if err != nil {
 		return err
 	}
 
+	//get each score param from redis
 	followingK := redisClient.GetScoreParam("following", "k")
 	followingW := redisClient.GetScoreParam("following", "w")
 	followersK := redisClient.GetScoreParam("followers", "k")
@@ -54,6 +59,7 @@ func (root *DatabaseRoot) InitScoreConfig() error {
 	forksK := redisClient.GetScoreParam("forks", "k")
 	forksW := redisClient.GetScoreParam("forks", "w")
 
+	//assign params to struct
 	scoreConfig := &ScoreParams{
 		FollowingK:      followingK,
 		FollowingW:      followingW,

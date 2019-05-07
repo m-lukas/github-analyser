@@ -16,6 +16,7 @@ func SetScore(user *db.User, config *db.ScoreParams) {
 
 }
 
+//SaveConfigValues is a wrapper function to save a given map of key-hashValue pairs for a certain field into redis
 func SaveConfigValues(pairs map[string]interface{}, field string) error {
 
 	redisClient, err := db.GetRedis()
@@ -24,7 +25,6 @@ func SaveConfigValues(pairs map[string]interface{}, field string) error {
 	}
 
 	for key, value := range pairs {
-
 		err = redisClient.HashInsert(key, field, value)
 		if err != nil {
 			return err
@@ -34,6 +34,7 @@ func SaveConfigValues(pairs map[string]interface{}, field string) error {
 	return nil
 }
 
+//UpdateAllScores is a wrapper function to update the scores of all users after changed scoreparams
 func UpdateAllScores() error {
 
 	mongoClient, err := db.GetMongo()
@@ -42,20 +43,25 @@ func UpdateAllScores() error {
 	}
 	collectionName := "users"
 
+	//get all users from collection
 	userArray, err := mongoClient.FindAllUsers(collectionName)
 	if err != nil {
 		return err
 	}
 
+	//retrieve score params (already updated)
 	scoreConfig, err := db.GetScoreConfig()
 	if err != nil {
 		return err
 	}
 
+	//update score for each user
 	for _, user := range userArray {
 
+		//update scores of the user object
 		SetScore(user, scoreConfig)
 
+		//update user in collection
 		filter := bson.D{{"login", user.Login}}
 		err = mongoClient.UpdateAll(filter, user, collectionName)
 		if err != nil {

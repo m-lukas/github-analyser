@@ -2,6 +2,7 @@ package db
 
 import "time"
 
+//User schema
 type User struct {
 	Login                     string    `bson:"login"`
 	Name                      string    `bson:"name"`
@@ -38,6 +39,7 @@ type User struct {
 	UpdatedAt                 time.Time `bson:"updated_at"`
 }
 
+//ScoreParams schema
 type ScoreParams struct {
 	FollowingK      float64
 	FollowingW      float64
@@ -75,6 +77,7 @@ type ScoreParams struct {
 	ForksW          float64
 }
 
+//Scores schema
 type Scores struct {
 	FollowingScore      float64
 	FollowersScore      float64
