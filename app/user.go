@@ -1,7 +1,7 @@
 package app
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/m-lukas/github-analyser/controller"
 	"github.com/m-lukas/github-analyser/db"
@@ -32,6 +32,22 @@ type UserSearchAggregationResponse struct {
 	Data []*db.User
 }
 
+func doGetUser(userName string) (*db.User, *httputil.ErrorResponse) {
+
+	if userName == "" {
+		return nil, httputil.FromTranslationKey(400, translate.MissingParameter)
+	}
+
+	user, err := controller.GetUser(userName)
+	if err != nil {
+		log.Println(err)
+		return nil, httputil.FromTranslationKey(500, translate.ServerError)
+	}
+
+	return user, nil
+
+}
+
 func doGetScore(userName string) (*scoreResponse, *httputil.ErrorResponse) {
 
 	if userName == "" {
@@ -40,6 +56,7 @@ func doGetScore(userName string) (*scoreResponse, *httputil.ErrorResponse) {
 
 	user, err := controller.GetUser(userName)
 	if err != nil {
+		log.Println(err)
 		return nil, httputil.FromTranslationKey(500, translate.ServerError)
 	}
 
@@ -51,25 +68,9 @@ func doGetScore(userName string) (*scoreResponse, *httputil.ErrorResponse) {
 	return resp, nil
 }
 
-func doGetUser(userName string) (*db.User, *httputil.ErrorResponse) {
-
-	if userName == "" {
-		return nil, httputil.FromTranslationKey(400, translate.MissingParameter)
-	}
-
-	user, err := controller.GetUser(userName)
-	if err != nil {
-		return nil, httputil.FromTranslationKey(500, translate.ServerError)
-	}
-
-	return user, nil
-
-}
-
-func doGetNearestUserByScore(score int) (*ActivityAggregationResponse, *httputil.ErrorResponse) {
+func doGetNearestUserByScore(score int, collectionName string) (*ActivityAggregationResponse, *httputil.ErrorResponse) {
 
 	pipeline := db.Pipeline{}
-	collectionName := "users"
 
 	pipeline.Add(bson.D{{"$project", bson.D{{"login", 1}, {"activity_score", 1}, {"difference", bson.D{{"$abs", bson.D{{"$subtract", bson.A{score, "$activity_score"}}}}}}}}})
 	pipeline.Add(bson.D{{"$match", bson.D{{"activity_score", bson.D{{"$gt", 0}}}}}})
@@ -80,17 +81,16 @@ func doGetNearestUserByScore(score int) (*ActivityAggregationResponse, *httputil
 
 	err := pipeline.Run(&result, collectionName)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return nil, httputil.FromTranslationKey(500, translate.ServerError)
 	}
 
 	return &result, nil
 }
 
-func doGetNextUsersByScore(score int, entries int) (*ActivityAggregationResponse, *httputil.ErrorResponse) {
+func doGetNextUsersByScore(score int, entries int, collectionName string) (*ActivityAggregationResponse, *httputil.ErrorResponse) {
 
 	pipeline := db.Pipeline{}
-	collectionName := "users"
 
 	pipeline.Add(bson.D{{"$match", bson.D{{"activity_score", bson.D{{"$gt", score}}}}}})
 	pipeline.Add(bson.D{{"$sort", bson.D{{"activity_score", 1}}}})
@@ -101,17 +101,16 @@ func doGetNextUsersByScore(score int, entries int) (*ActivityAggregationResponse
 
 	err := pipeline.Run(&result, collectionName)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return nil, httputil.FromTranslationKey(500, translate.ServerError)
 	}
 
 	return &result, nil
 }
 
-func doGetPreviousUsersByScore(score int, entries int) (*ActivityAggregationResponse, *httputil.ErrorResponse) {
+func doGetPreviousUsersByScore(score int, entries int, collectionName string) (*ActivityAggregationResponse, *httputil.ErrorResponse) {
 
 	pipeline := db.Pipeline{}
-	collectionName := "users"
 
 	pipeline.Add(bson.D{{"$match", bson.D{{"activity_score", bson.D{{"$lt", score}}}}}})
 	pipeline.Add(bson.D{{"$sort", bson.D{{"activity_score", -1}}}})
@@ -122,17 +121,16 @@ func doGetPreviousUsersByScore(score int, entries int) (*ActivityAggregationResp
 
 	err := pipeline.Run(&result, collectionName)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return nil, httputil.FromTranslationKey(500, translate.ServerError)
 	}
 
 	return &result, nil
 }
 
-func doSearch(query string) (*UserSearchAggregationResponse, *httputil.ErrorResponse) {
+func doSearch(query string, collectionName string) (*UserSearchAggregationResponse, *httputil.ErrorResponse) {
 
 	pipeline := db.Pipeline{}
-	collectionName := "users"
 
 	pipeline.Add(bson.D{{"$match", bson.D{{"$text", bson.D{{"$search", query}}}}}})
 
@@ -140,7 +138,7 @@ func doSearch(query string) (*UserSearchAggregationResponse, *httputil.ErrorResp
 
 	err := pipeline.Run(&result, collectionName)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return nil, httputil.FromTranslationKey(500, translate.ServerError)
 	}
 

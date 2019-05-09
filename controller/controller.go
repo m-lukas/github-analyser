@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/m-lukas/github-analyser/util"
+
 	"github.com/m-lukas/github-analyser/db"
 )
 
@@ -14,9 +16,15 @@ func GetUser(userName string) (*db.User, error) {
 
 	collectionName := "users"
 
+	if util.IsTesting() {
+		collectionName = "test_getuser"
+		fmt.Println("TRUE")
+	}
+
 	user, err := fetchUser(userName)
 	if err != nil {
 
+		log.Println(err)
 		fmt.Println("Trying to retrieve user from cache.")
 		user, err = GetUserFromCache(userName, collectionName)
 		if err != nil {

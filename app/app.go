@@ -24,7 +24,7 @@ func InitRouter(apiPath string) *chi.Mux {
 		},
 	)
 
-	InitUserRoutes(router)
+	InitUserRoutes(router, apiPath)
 
 	return router
 }

@@ -17,8 +17,6 @@ func Test_Caching(t *testing.T) {
 
 	var err error
 
-	db.TestRoot = &db.DatabaseRoot{}
-
 	testUser := &db.User{
 		Login:         "m-lukas",
 		Name:          "Lukas Müller",
@@ -27,21 +25,12 @@ func Test_Caching(t *testing.T) {
 		ActivityScore: 50.001,
 	}
 
-	err = db.TestRoot.InitMongoClient()
-	require.Nil(t, err)
-
-	mongoClient := db.TestRoot.MongoClient
-
-	require.Equal(t, mongoClient.Config.Enviroment, db.ENV_TEST) //check for right db config
-
-	collectionName := "test_caching"
-	collection := mongoClient.Database.Collection(collectionName)
-
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	err = collection.Drop(ctx)
-	require.Nil(t, err, "droping of collection failed")
+	db.TestRoot = &db.DatabaseRoot{}
+	collectionName := "test_caching"
+	_, collection := setupMongoTest(t, db.TestRoot, collectionName, ctx)
 
 	t.Run("user couldn't be cached", func(t *testing.T) {
 		err = CacheUser(testUser, collectionName)

@@ -137,7 +137,7 @@ func query(userName string, queryPath string, object interface{}) error {
 	request := newRequest(query)
 	request.variable("name", userName)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	err = client.run(ctx, request, object)
 	if err != nil {

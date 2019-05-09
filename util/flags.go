@@ -1,17 +1,17 @@
 package util
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"os"
+	"strings"
 )
 
 func IsTesting() bool {
-	if flag.Lookup("test.v") == nil {
-		return false
+	if strings.HasSuffix(os.Args[0], ".test") {
+		return true
 	}
-	return true
+	return false
 }
 
 func ReadBoolFlag(flagName string) bool {

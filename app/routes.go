@@ -9,9 +9,9 @@ import (
 	"github.com/go-chi/chi"
 )
 
-func InitUserRoutes(router *chi.Mux) {
+func InitUserRoutes(router *chi.Mux, basePath string) {
 
-	router.Route("/user", func(r chi.Router) {
+	router.Route(basePath+"/user", func(r chi.Router) {
 
 		r.Get("/{login}", func(w http.ResponseWriter, r *http.Request) {
 			userName := getParam(r, "login")
@@ -38,18 +38,20 @@ func InitUserRoutes(router *chi.Mux) {
 
 	})
 
-	router.Route("/score", func(r chi.Router) {
+	router.Route(basePath+"/score", func(r chi.Router) {
 
 		r.Get("/{score}", func(w http.ResponseWriter, r *http.Request) {
 			score := getParam(r, "score")
 
-			scoreInt, e := strconv.Atoi(score)
+			scoreInt, e := checkAndConvertScore(score)
 			if e != nil {
 				err := httputil.FromTranslationKey(400, translate.MissingParameter)
 				err.Write(w)
 			}
 
-			resp, err := doGetNearestUserByScore(scoreInt)
+			collectionName := getUserCollectionName()
+
+			resp, err := doGetNearestUserByScore(scoreInt, collectionName)
 			if err != nil {
 				err.Write(w)
 				return
@@ -61,14 +63,20 @@ func InitUserRoutes(router *chi.Mux) {
 			score := getParam(r, "score")
 			entries := getParam(r, "entries")
 
-			scoreInt, e := strconv.Atoi(score)
+			scoreInt, e := checkAndConvertScore(score)
+			if e != nil {
+				err := httputil.FromTranslationKey(400, translate.MissingParameter)
+				err.Write(w)
+			}
 			entriesInt, e := strconv.Atoi(entries)
 			if e != nil {
 				err := httputil.FromTranslationKey(400, translate.MissingParameter)
 				err.Write(w)
 			}
 
-			resp, err := doGetNextUsersByScore(scoreInt, entriesInt)
+			collectionName := getUserCollectionName()
+
+			resp, err := doGetNextUsersByScore(scoreInt, entriesInt, collectionName)
 			if err != nil {
 				err.Write(w)
 				return
@@ -80,14 +88,20 @@ func InitUserRoutes(router *chi.Mux) {
 			score := getParam(r, "score")
 			entries := getParam(r, "entries")
 
-			scoreInt, e := strconv.Atoi(score)
+			scoreInt, e := checkAndConvertScore(score)
+			if e != nil {
+				err := httputil.FromTranslationKey(400, translate.MissingParameter)
+				err.Write(w)
+			}
 			entriesInt, e := strconv.Atoi(entries)
 			if e != nil {
 				err := httputil.FromTranslationKey(400, translate.MissingParameter)
 				err.Write(w)
 			}
 
-			resp, err := doGetPreviousUsersByScore(scoreInt, entriesInt)
+			collectionName := getUserCollectionName()
+
+			resp, err := doGetPreviousUsersByScore(scoreInt, entriesInt, collectionName)
 			if err != nil {
 				err.Write(w)
 				return
@@ -103,7 +117,9 @@ func InitUserRoutes(router *chi.Mux) {
 		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 			query := getQueryParam(r, "search")
 
-			resp, err := doSearch(query)
+			collectionName := getUserCollectionName()
+
+			resp, err := doSearch(query, collectionName)
 			if err != nil {
 				err.Write(w)
 				return
