@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 )
 
+//mock data for general query
 func generalQueryTestResult() (*GeneralDataRaw, error) {
 
 	var rawData *GeneralDataRaw
@@ -53,6 +54,7 @@ func generalQueryTestResult() (*GeneralDataRaw, error) {
 	return rawData, nil
 }
 
+//mock data for commit query
 func commitQueryTestResult() (*CommitDataRaw, error) {
 
 	var rawData *CommitDataRaw
@@ -103,6 +105,7 @@ func commitQueryTestResult() (*CommitDataRaw, error) {
 	return rawData, nil
 }
 
+//mock data for populating query
 func populatingQueryTestResult() (*PopulatingDataRaw, error) {
 
 	var rawData *PopulatingDataRaw

@@ -10,13 +10,13 @@ import (
 
 func Test_Calc(t *testing.T) {
 
-	t.Run("average calc failed", func(t *testing.T) {
+	t.Run("Avg(): average calc failed", func(t *testing.T) {
 		slice := []float64{15.4, 24.1234, 16.001, 200.51423, 12.0, 50.999}
 		expected := 53.17293833333334
 		assert.Equal(t, expected, util.Avg(slice))
 	})
 
-	t.Run("distance between numbers", func(t *testing.T) {
+	t.Run("DistanceToNumber(): distance between numbers", func(t *testing.T) {
 		var origin float64
 		var target float64
 		var expected float64
@@ -35,7 +35,7 @@ func Test_Calc(t *testing.T) {
 		assert.Equal(t, expected, distance, "failed to get distance from positive")
 	})
 
-	t.Run("biggest value in sorted array", func(t *testing.T) {
+	t.Run("BiggestValueSorted(): biggest value in sorted array", func(t *testing.T) {
 		expected := 22.98
 
 		sliceSorted := []float64{1.12, 3.14, 5.0032, 10.5367, 16.001, 22.98}
@@ -45,7 +45,7 @@ func Test_Calc(t *testing.T) {
 		assert.NotEqual(t, expected, util.BiggestValueSorted(sliceMixed))
 	})
 
-	t.Run("nearest distance", func(t *testing.T) {
+	t.Run("NearestDistance(): nearest distance", func(t *testing.T) {
 		testTable := []struct {
 			Target   float64
 			First    float64

@@ -35,12 +35,12 @@ func Test_Contains(t *testing.T) {
 		{slice3, "ouka", false},
 	}
 
-	t.Run("normal: contains", func(t *testing.T) {
+	t.Run("Contains(): test", func(t *testing.T) {
 		for _, test := range testTable {
 			assert.Equal(t, test.Output, util.Contains(test.Slice, test.Query))
 		}
 	})
-	t.Run("binary: contains", func(t *testing.T) {
+	t.Run("BinaryContains(): test", func(t *testing.T) {
 		for _, test := range testTable {
 			assert.Equal(t, test.Output, util.BinaryContains(test.Slice, test.Query))
 		}
@@ -50,18 +50,19 @@ func Test_Contains(t *testing.T) {
 func Benchmark_Contains(b *testing.B) {
 	slice, contained := generateStringSlice(slice_size)
 
-	b.Run("normal: benchmark", func(b *testing.B) {
+	b.Run("Contains(): benchmark", func(b *testing.B) {
 		for n := 0; n < b.N; n++ {
 			util.Contains(slice, contained)
 		}
 	})
-	b.Run("binary: benchmark", func(b *testing.B) {
+	b.Run("BinaryContains(): benchmark", func(b *testing.B) {
 		for n := 0; n < b.N; n++ {
 			util.BinaryContains(slice, contained)
 		}
 	})
 }
 
+//testing helper functions for creating string slices of size n
 func generateStringSlice(lenght int) ([]string, string) {
 
 	var resSlice []string

@@ -9,7 +9,7 @@ import (
 )
 
 func Test_Queue(t *testing.T) {
-	t.Run("not able to pop item from queue", func(t *testing.T) {
+	t.Run("Pop(): not able to pop item from queue", func(t *testing.T) {
 		queue := &util.Queue{}
 		queue.Elements = append(queue.Elements, "test1")
 		queue.Elements = append(queue.Elements, "test2")
@@ -21,7 +21,7 @@ func Test_Queue(t *testing.T) {
 		item3 := queue.Pop()
 		assert.Equal(t, "test3", item3)
 	})
-	t.Run("not able to push item to queue", func(t *testing.T) {
+	t.Run("Push(): not able to push item to queue", func(t *testing.T) {
 		queue := &util.Queue{}
 		queue.Push("test1")
 		queue.Push("test2")
@@ -30,7 +30,7 @@ func Test_Queue(t *testing.T) {
 		assert.Equal(t, "test2", queue.Elements[1])
 		assert.Equal(t, "test3", queue.Elements[2])
 	})
-	t.Run("queue integration", func(t *testing.T) {
+	t.Run("Queue Integration", func(t *testing.T) {
 		var lenght int
 		var item interface{}
 

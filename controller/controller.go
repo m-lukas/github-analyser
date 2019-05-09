@@ -18,7 +18,6 @@ func GetUser(userName string) (*db.User, error) {
 
 	if util.IsTesting() {
 		collectionName = "test_getuser"
-		fmt.Println("TRUE")
 	}
 
 	user, err := fetchUser(userName)

@@ -17,7 +17,7 @@ const (
 
 func Test_Files(t *testing.T) {
 
-	t.Run("not able to write file", func(t *testing.T) {
+	t.Run("WriteFile(): not able to write file", func(t *testing.T) {
 		var err error
 
 		err = util.WriteFile(write_test, []string{"test1", "test2", "test3"})
@@ -28,7 +28,7 @@ func Test_Files(t *testing.T) {
 		assert.Nil(t, err)
 	})
 
-	t.Run("not able to read lines in file", func(t *testing.T) {
+	t.Run("ReadLines(): not able to read lines in file", func(t *testing.T) {
 		expected := []string{"hallo", "hello", "salut"}
 
 		output, err := util.ReadLines(read_test)
@@ -37,14 +37,14 @@ func Test_Files(t *testing.T) {
 		assert.Equal(t, expected, output)
 	})
 
-	t.Run("doesn't recognise file format", func(t *testing.T) {
+	t.Run("HasFileFormat(): doesn't recognise file format", func(t *testing.T) {
 		assert.True(t, util.HasFileFormat("./util/test/test_write.txt", "txt"))
 		assert.True(t, util.HasFileFormat("file.txt", "txt"))
 		assert.False(t, util.HasFileFormat("./something/image.png", "jpg"))
 		assert.True(t, util.HasFileFormat("./whatever/document.docx", "docx"))
 	})
 
-	t.Run("integration: failed to retrive input array", func(t *testing.T) {
+	t.Run("ReadInputFiles(): (integration) failed to retrive input array", func(t *testing.T) {
 		var output []string
 		var err error
 		var expected = []string{"hallo", "hello", "salut"}
@@ -61,7 +61,7 @@ func Test_Files(t *testing.T) {
 		assert.Equal(t, expected, output)
 	})
 
-	t.Run("not able to read file (query)", func(t *testing.T) {
+	t.Run("ReadFile(): not able to read file (query)", func(t *testing.T) {
 		expected := "hallo\nhello\nsalut"
 
 		output, err := util.ReadFile(read_test)

@@ -10,14 +10,14 @@ import (
 )
 
 func Test_Util(t *testing.T) {
-	t.Run("duration format is wrong", func(t *testing.T) {
+	t.Run("FormatDuration(): duration format is wrong", func(t *testing.T) {
 		startTime := time.Now().Add(-1*time.Hour - 5*time.Minute - 20*time.Second)
 		duration := time.Since(startTime)
 		durationString := util.FormatDuration(duration)
 		assert.Equal(t, "01h:05m:20s", durationString)
 	})
 
-	t.Run("poping n items from slice", func(t *testing.T) {
+	t.Run("PopN(): poping n items from slice", func(t *testing.T) {
 
 		popSlice := []string{
 			"test1",
@@ -41,7 +41,7 @@ func Test_Util(t *testing.T) {
 		assert.Equal(t, 0, len(popSlice), "items weren't removed from slice")
 	})
 
-	t.Run("remove duplicated", func(t *testing.T) {
+	t.Run("RemoveDuplicates(): remove duplicated", func(t *testing.T) {
 
 		duplicateSlice := []string{
 			"hallo",

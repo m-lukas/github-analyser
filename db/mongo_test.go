@@ -17,22 +17,24 @@ func Test_Mongo(t *testing.T) {
 	root := &DatabaseRoot{}
 	var mongoClient *MongoClient
 
-	//root.InitMongoClient()
-	t.Run("mongo initialization doesn't work", func(t *testing.T) {
+	t.Run("InitMongoClient(): mongo initialization failed", func(t *testing.T) {
 		err = root.InitMongoClient()
 		require.Nil(t, err, "failed to initialize mongo client")
 
 		mongoClient = root.MongoClient
 		require.NotNil(t, mongoClient, "failed to initialize mongo client")
 
+		//ping client to check if proper connection is established
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		err = mongoClient.Client.Ping(ctx, readpref.Primary())
 		require.Nil(t, err, "initialized mongo database not reachable")
 	})
 
+	//check config for futher operations on the database
 	require.Equal(t, mongoClient.Config.Enviroment, ENV_TEST) //check for right db config
 
+	//drop test collection
 	collectionName := "test_mongo"
 	err = mongoClient.Database.Collection(collectionName).Drop(context.Background()) //drop test collection
 	require.Nil(t, err, "droping of collection failed")
@@ -61,13 +63,14 @@ func Test_Mongo(t *testing.T) {
 		},
 	}
 
-	//test all mongo functions
-	t.Run("database functionality test", func(t *testing.T) {
+	t.Run("Mongo UTIL: database functionality test", func(t *testing.T) {
+		//insert all users of test array
 		for _, user := range testSlice {
 			err := mongoClient.Insert(user, collectionName)
 			require.Nil(t, err, "insert failed")
 		}
 
+		//testuser with changes
 		testUser := "m-lukas"
 		update := &User{
 			Login:         testUser,
@@ -77,19 +80,23 @@ func Test_Mongo(t *testing.T) {
 			Repositories:  200,
 		}
 
+		//update existing
 		filter := bson.D{{"login", testSlice[0].Login}}
 		err := mongoClient.UpdateAll(filter, update, collectionName)
 		require.Nil(t, err, "update failed")
 
+		//find one
 		retrivedUser, err := mongoClient.FindUser(testUser, collectionName)
 		require.Nil(t, err, "user not found")
 		require.Equal(t, update.Repositories, retrivedUser.Repositories, "update hasn't update document")
 
+		//find all
 		userSlice, err := mongoClient.FindAllUsers(collectionName)
 		require.Nil(t, err, "find all failed")
 		require.Equal(t, len(testSlice), len(userSlice))
 	})
 
+	//drop collection after test
 	err = mongoClient.Database.Collection(collectionName).Drop(context.Background()) //drop test collection
 	require.Nil(t, err, "droping of collection failed")
 }

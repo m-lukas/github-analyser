@@ -9,15 +9,17 @@ import (
 
 func Test_CommitQuery(t *testing.T) {
 
+	//parse test-time from string and layout
 	timeLayout := "2006-01-02T15:04:05.000Z"
 	baseTime := "2019-05-05T14:10:00.000Z"
 	dateTime, err := time.Parse(timeLayout, baseTime)
 	require.Nil(t, err, "internal: time parse error")
 
+	//get mock data
 	rawData, err := commitQueryTestResult()
 	require.Nil(t, err, "internal: query parse error")
 
-	t.Run("hours difference", func(t *testing.T) {
+	t.Run("getHoursDifference(): hours difference", func(t *testing.T) {
 
 		startDate := dateTime.Add(-5*time.Hour - 30*time.Minute)
 		endDate := dateTime
@@ -28,7 +30,7 @@ func Test_CommitQuery(t *testing.T) {
 		require.Equal(t, 20.204166666666666, getHoursDifference(endDate, startDate))
 	})
 
-	t.Run("commit frequenz calculation", func(t *testing.T) {
+	t.Run("GetCommitFrequenz(): commit frequenz calculation", func(t *testing.T) {
 		expected := 194.21968055555556
 		frequenz := GetCommitFrequenz(rawData, dateTime)
 		require.Equal(t, expected, frequenz)

@@ -13,7 +13,7 @@ func Test_GeneralQuery(t *testing.T) {
 	rawData, err := generalQueryTestResult()
 	require.Nil(t, err, "internal: query parse error")
 
-	t.Run("stargazer and fork sum", func(t *testing.T) {
+	t.Run("calcStargazersAndForks(): stargazer and fork sum", func(t *testing.T) {
 
 		var stargazers int
 		var forks int
@@ -39,7 +39,7 @@ func Test_GeneralQuery(t *testing.T) {
 		assert.Equal(t, expectedForks, forks, "no repositories")
 	})
 
-	t.Run("raw data conversion", func(t *testing.T) {
+	t.Run("convertGeneralData(): raw data conversion", func(t *testing.T) {
 
 		data := convertGeneralData(rawData)
 		rawLogin := rawData.RepositoryOwner.Login

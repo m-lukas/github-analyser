@@ -26,7 +26,7 @@ func Test_App(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	//initialize test database and collection
+	//initialize mongo database and test collection
 	db.TestRoot = &db.DatabaseRoot{}
 	collectionName := "test_getuser"
 	mongoClient, collection := setupMongoTest(t, db.TestRoot, collectionName, ctx)
