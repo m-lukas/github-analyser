@@ -34,12 +34,12 @@ type DatabaseRoot struct {
 func Init() error {
 	var err error
 
-	dbRoot = &DatabaseRoot{}
-
 	//break in testing enviroment to avoid cross-execution of funtions
 	if util.IsTesting() {
 		return errors.New("not available in testing enviroment")
 	}
+
+	dbRoot = &DatabaseRoot{}
 
 	err = dbRoot.InitMongoClient()
 	if err != nil {
