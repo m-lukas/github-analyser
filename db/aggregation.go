@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -69,6 +70,7 @@ func (p *Pipeline) Run(result interface{}, collectionName string) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println(string(bytes))
 	bson.Unmarshal(bytes, result)
 
 	return nil

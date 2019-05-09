@@ -34,7 +34,7 @@ func Test_Caching(t *testing.T) {
 
 	require.Equal(t, mongoClient.Config.Enviroment, db.ENV_TEST) //check for right db config
 
-	collectionName := "users_test"
+	collectionName := "test_caching"
 	collection := mongoClient.Database.Collection(collectionName)
 
 	err = collection.Drop(context.Background())

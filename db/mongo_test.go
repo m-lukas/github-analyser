@@ -33,7 +33,7 @@ func Test_Mongo(t *testing.T) {
 
 	require.Equal(t, mongoClient.Config.Enviroment, ENV_TEST) //check for right db config
 
-	collectionName := "users_test"
+	collectionName := "test_mongo"
 	err = mongoClient.Database.Collection(collectionName).Drop(context.Background()) //drop test collection
 	require.Nil(t, err, "droping of collection failed")
 
