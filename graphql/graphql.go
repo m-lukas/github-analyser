@@ -1,5 +1,7 @@
 package graphql
 
+//Custom-Version of https://github.com/graphql-go/graphql
+
 import (
 	"bytes"
 	"context"
