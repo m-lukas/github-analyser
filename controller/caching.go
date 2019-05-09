@@ -35,13 +35,12 @@ func CacheUser(user *db.User, collectionName string) error {
 }
 
 //GetUserFromCache retrieves a user from the given collection by login
-func GetUserFromCache(login string) (*db.User, error) {
+func GetUserFromCache(login string, collectionName string) (*db.User, error) {
 
 	mongoClient, err := db.GetMongo()
 	if err != nil {
 		return nil, err
 	}
-	collectionName := "users"
 
 	dbUser, err := mongoClient.FindUser(login, collectionName)
 	if err != nil {

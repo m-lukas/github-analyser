@@ -12,11 +12,13 @@ const timoutSeconds = 15
 
 func GetUser(userName string) (*db.User, error) {
 
+	collectionName := "users"
+
 	user, err := fetchUser(userName)
 	if err != nil {
 
 		fmt.Println("Trying to retrieve user from cache.")
-		user, err = GetUserFromCache(userName)
+		user, err = GetUserFromCache(userName, collectionName)
 		if err != nil {
 			return nil, err
 		}
@@ -34,7 +36,7 @@ func GetUser(userName string) (*db.User, error) {
 	SetScore(user, config)
 
 	go func(user *db.User) {
-		err = CacheUser(user, "users")
+		err = CacheUser(user, collectionName)
 		if err != nil {
 			log.Println(err)
 		}

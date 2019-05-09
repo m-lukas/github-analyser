@@ -44,4 +44,33 @@ func Test_Calc(t *testing.T) {
 		sliceMixed := []float64{3.14, 22.98, 1.12, 16.001, 10.5367, 5.0032}
 		assert.NotEqual(t, expected, util.BiggestValueSorted(sliceMixed))
 	})
+
+	t.Run("nearest distance", func(t *testing.T) {
+		testTable := []struct {
+			Target   float64
+			First    float64
+			Second   float64
+			Third    float64
+			Expected float64
+		}{
+			{Target: 15.0, First: 14.25, Second: 18.33, Third: -15.25, Expected: 14.25},
+			{Target: 2.335, First: 10.1333, Second: 10.1332, Third: -12.02, Expected: 10.1332},
+			{Target: -22.99, First: -25.5, Second: -1.764, Third: -22.98, Expected: -22.98},
+		}
+
+		for _, set := range testTable {
+			output := util.NearestDistance(set.Target, set.First, set.Second, set.Third)
+			assert.Equal(t, set.Expected, output)
+		}
+	})
+
+	t.Run("calc k from y", func(t *testing.T) {
+		y := 50.0
+		x := 125.25
+		expected := 1.2525
+
+		k := util.CalcKFromY(y, x)
+		assert.Equal(t, expected, k)
+	})
+
 }

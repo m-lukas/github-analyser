@@ -31,12 +31,12 @@ func calcK(users []*db.User, fieldType string) float64 {
 
 		biggestValue := util.BiggestValueSorted(valueArray)
 
-		k := calcKFromY(99.9999, biggestValue)
+		k := util.CalcKFromY(99.9999, biggestValue)
 		return k
 	}
 
 	var avgScore = 50.0
-	k := calcKFromY(avgScore, midValue)
+	k := util.CalcKFromY(avgScore, midValue)
 
 	return k
 
@@ -136,10 +136,6 @@ func getNearestToAvgValue(valueArray []float64) float64 {
 
 }
 
-func calcKFromY(y float64, x float64) float64 {
-	return x/y - 0.01*x
-}
-
 func compareDistanceLoop(valueArray []float64, startIndex int, endIndex int, direction string, average float64) float64 {
 
 	switch direction {
@@ -151,7 +147,7 @@ func compareDistanceLoop(valueArray []float64, startIndex int, endIndex int, dir
 			currentVal := valueArray[i]
 			nextVal := valueArray[i+1]
 
-			nearest := nearestDistance(average, lastVal, currentVal, nextVal)
+			nearest := util.NearestDistance(average, lastVal, currentVal, nextVal)
 			if nearest != nextVal {
 				return nearest
 			}
@@ -169,7 +165,7 @@ func compareDistanceLoop(valueArray []float64, startIndex int, endIndex int, dir
 			currentVal := valueArray[i]
 			nextVal := valueArray[i-1]
 
-			nearest := nearestDistance(average, lastVal, currentVal, nextVal)
+			nearest := util.NearestDistance(average, lastVal, currentVal, nextVal)
 			if nearest != nextVal {
 				return nearest
 			}
@@ -185,23 +181,5 @@ func compareDistanceLoop(valueArray []float64, startIndex int, endIndex int, dir
 	}
 
 	return 0.0
-
-}
-
-func nearestDistance(target float64, first float64, second float64, third float64) float64 {
-
-	distanceFromFirst := util.DistanceToNumber(first, target)
-	distanceFromSecond := util.DistanceToNumber(second, target)
-	distanceFromThird := util.DistanceToNumber(third, target)
-
-	if distanceFromSecond > distanceFromFirst {
-		return first
-	}
-
-	if distanceFromSecond < distanceFromThird {
-		return second
-	}
-
-	return third
 
 }

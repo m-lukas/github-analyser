@@ -37,7 +37,10 @@ func Test_Caching(t *testing.T) {
 	collectionName := "test_caching"
 	collection := mongoClient.Database.Collection(collectionName)
 
-	err = collection.Drop(context.Background())
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	err = collection.Drop(ctx)
 	require.Nil(t, err, "droping of collection failed")
 
 	t.Run("user couldn't be cached", func(t *testing.T) {
@@ -47,10 +50,7 @@ func Test_Caching(t *testing.T) {
 		err = CacheUser(testUser, collectionName)
 		require.Nil(t, err, "failed to cache user")
 
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-
-		count, err := collection.CountDocuments(ctx, bson.M{"login": "m-lukas"})
+		count, err := collection.CountDocuments(ctx, bson.M{"login": testUser.Login})
 		assert.Nil(t, err, "mongo internal: failed to count documents")
 		assert.Equal(t, int64(1), count, "didn't update existing user")
 
@@ -61,7 +61,23 @@ func Test_Caching(t *testing.T) {
 		assert.Equal(t, testUser.Login, dbUser.Login, "user wasn't saved properly")
 	})
 
-	err = collection.Drop(context.Background())
+	count, err := collection.CountDocuments(ctx, bson.M{"login": testUser.Login})
+	assert.Nil(t, err, "mongo internal: failed to count documents")
+	require.Equal(t, int64(1), count, "something went wrong while caching")
+
+	t.Run("user couldn't retrive user from cache", func(t *testing.T) {
+
+		user, err := GetUserFromCache(testUser.Login, collectionName)
+		assert.Nil(t, err, "failed to get user from cache")
+		assert.Equal(t, user.Login, testUser.Login)
+		assert.Equal(t, user.Name, testUser.Name)
+		assert.Equal(t, user.Location, testUser.Location)
+		assert.Equal(t, user.Repositories, testUser.Repositories)
+		assert.Equal(t, user.ActivityScore, testUser.ActivityScore)
+
+	})
+
+	err = collection.Drop(ctx)
 	assert.Nil(t, err, "droping of collection failed")
 
 	db.TestRoot = nil
