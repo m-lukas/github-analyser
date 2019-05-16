@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -47,8 +48,6 @@ func (client *ElasticClient) getTestConfig() *ElasticConfig {
 //InitElasticClient establishes a connection to the elasticDB instance
 func (root *DatabaseRoot) InitElasticClient() error {
 
-	return nil
-
 	elasticClient := &ElasticClient{}
 	//assign config according to the enviroment
 	if util.IsTesting() {
@@ -68,6 +67,7 @@ func (root *DatabaseRoot) InitElasticClient() error {
 		elastic.SetInfoLog(log.New(os.Stdout, "", log.LstdFlags)),
 	)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
