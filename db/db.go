@@ -25,9 +25,10 @@ const (
 
 //DatabaseRootstructure contains all database clients
 type DatabaseRoot struct {
-	MongoClient *MongoClient
-	RedisClient *RedisClient
-	ScoreConfig *ScoreParams
+	MongoClient   *MongoClient
+	RedisClient   *RedisClient
+	ElasticClient *ElasticClient
+	ScoreConfig   *ScoreParams
 }
 
 //Init initializes the dbRoot and triggers the initialization of all db clients
@@ -47,6 +48,11 @@ func Init() error {
 	}
 
 	err = dbRoot.InitRedisClient()
+	if err != nil {
+		return err
+	}
+
+	err = dbRoot.InitElasticClient()
 	if err != nil {
 		return err
 	}
@@ -114,6 +120,38 @@ func GetRedis() (*RedisClient, error) {
 	}
 
 	return root.RedisClient, nil
+}
+
+//GetElastic pings the elastic client and returns a *ElasticClient object if reachable
+func GetElastic() (*ElasticClient, error) {
+
+	root, err := getRoot()
+	if err != nil {
+		return nil, err
+	}
+
+	//check if db config has right enviroment flag
+	if util.IsTesting() && root.ElasticClient.Config.Enviroment != ENV_TEST {
+		return nil, errors.New("using production database while in testing")
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	//ping existing client
+	client := root.ElasticClient.Client
+	config := root.ElasticClient.Config
+	_, _, err = client.Ping(config.ElasticURI).Do(ctx)
+	if err != nil {
+		//reinitialize if pinging failed
+		err = root.InitElasticClient()
+		if err != nil {
+			//return err if not reachable
+			return nil, err
+		}
+	}
+
+	return root.ElasticClient, nil
 }
 
 //GetScoreConfig retrieves the all score parameters or if nil, reinitializes them

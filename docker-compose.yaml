@@ -17,3 +17,13 @@ services:
       - '27018:27018'
     volumes:
       - ./data/mongo:/data/db
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.0.1
+    container_name: github_analyser_elastic
+    environment:
+      - discovery.type=single-node
+    volumes:
+      - .data/elastic:/data/elastic
+    ports:
+      - 9200:9200
