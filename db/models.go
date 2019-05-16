@@ -39,6 +39,14 @@ type User struct {
 	UpdatedAt                 time.Time `bson:"updated_at"`
 }
 
+//ElasticUser schema
+type ElasticUser struct {
+	Login     string `json:"login"`
+	Firstname string `json:"firstname"`
+	Lastname  string `json:"lastname"`
+	Bio       string `json:"bio"`
+}
+
 //ScoreParams schema
 type ScoreParams struct {
 	FollowingK      float64

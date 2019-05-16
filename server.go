@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -90,6 +91,23 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	client, err := db.GetElastic()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	results, err := client.Search("This", "user_index", "users", "bio", "firstname")
+	if err != nil {
+		log.Fatal(err)
+	}
+	var dataSlice []*db.ElasticUser
+	for _, message := range results {
+		var userData db.ElasticUser
+		err = json.Unmarshal(message, &userData)
+		dataSlice = append(dataSlice, &userData)
+	}
+	fmt.Println(dataSlice[0].Login)
 
 	if setupFlag {
 		setupInit()
