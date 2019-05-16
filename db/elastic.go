@@ -13,8 +13,9 @@ import (
 
 //ElasticClient contains the elastic db client, its config and the default database
 type ElasticClient struct {
-	Client *elastic.Client
-	Config *ElasticConfig
+	Client  *elastic.Client
+	Config  *ElasticConfig
+	Indexes map[string]string
 }
 
 //ElasticConfig contains config to init elastic db client
@@ -83,6 +84,13 @@ func (root *DatabaseRoot) InitElasticClient() error {
 
 	elasticClient.Client = client
 	root.ElasticClient = elasticClient
+
+	elasticClient.initIndexes()
+	err = elasticClient.checkIndexes()
+	if err != nil {
+		return err
+	}
+
 	log.Println("Initialized elastic client!")
 
 	return nil
