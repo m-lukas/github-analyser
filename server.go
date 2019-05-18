@@ -97,7 +97,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	results, err := client.Search("This", "user_index", "users", "bio", "firstname")
+	results, err := client.Search("This", "users_index", "_doc", "bio")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -107,7 +107,7 @@ func main() {
 		err = json.Unmarshal(message, &userData)
 		dataSlice = append(dataSlice, &userData)
 	}
-	fmt.Println(dataSlice[0].Login)
+	fmt.Println(len(dataSlice))
 
 	if setupFlag {
 		setupInit()

@@ -48,13 +48,22 @@ func (elasticClient *ElasticClient) checkIndexes() error {
 
 }
 
-const userMapping = `{
+const userMapping = `
+{
 	"mappings":{
-		"properties": {
-			"login":{"type":"keyword"},
-			"name":{"type":"text"},
-			"email":{"type":"keyword"},
-			"bio":{"type":"keyword"}
+		"properties":{
+			"login":{
+				"type":"keyword"
+			},
+			"email":{
+				"type":"keyword"
+			},
+			"name":{
+				"type":"text"
+			},
+			"bio":{
+				"type":"text"
+			}
 		}
 	}
 }`
