@@ -36,15 +36,17 @@ type User struct {
 	Scores                    *Scores   `bson:"scores"`
 	ActivityScore             float64   `bson:"activity_score"`
 	PopularityScore           float64   `bson:"popularity_score"`
+	ElasticID                 string    `bson:"elastic_id"`
 	UpdatedAt                 time.Time `bson:"updated_at"`
 }
 
 //ElasticUser schema
 type ElasticUser struct {
-	Login     string `json:"login"`
-	Firstname string `json:"firstname"`
-	Lastname  string `json:"lastname"`
-	Bio       string `json:"bio"`
+	Id    string `json:"id"`
+	Login string `json:"login"`
+	Email string `json:"email"`
+	Name  string `json:"name"`
+	Bio   string `json:"bio"`
 }
 
 //ScoreParams schema

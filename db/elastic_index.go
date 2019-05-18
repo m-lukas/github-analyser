@@ -7,13 +7,15 @@ import (
 )
 
 const (
-	user_index = "user_index"
+	user_index      = "user_index"
+	user_index_test = "user_index_test"
 )
 
 func (client *ElasticClient) initIndexes() {
 
 	client.Indexes = make(map[string]string, 0)
 	client.Indexes[user_index] = userMapping
+	client.Indexes[user_index_test] = userMapping
 
 }
 
@@ -46,28 +48,13 @@ func (elasticClient *ElasticClient) checkIndexes() error {
 
 }
 
-const userMapping = `
-{
-	"settings":{
-		"number_of_shards": 1,
-		"number_of_replicas": 0
-	},
+const userMapping = `{
 	"mappings":{
-		"records":{
-			"properties":{
-				"login":{
-					"type":"keyword"
-				},
-				"firstname":{
-					"type":"keyword"
-				},
-				"lastname":{
-					"type":"keyword"
-				},
-				"bio":{
-					"type":"keyword"
-				}
-			}
+		"properties": {
+			"login":{"type":"keyword"},
+			"name":{"type":"text"},
+			"email":{"type":"keyword"},
+			"bio":{"type":"keyword"}
 		}
 	}
 }`

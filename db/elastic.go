@@ -39,7 +39,7 @@ func (client *ElasticClient) getDefaultConfig() *ElasticConfig {
 //getTestConfig return config in test
 func (client *ElasticClient) getTestConfig() *ElasticConfig {
 	return &ElasticConfig{
-		ElasticURI:          "localhost:9201",
+		ElasticURI:          "http://localhost:9200",
 		SniffOpt:            false,
 		HealthCheckInterval: 10 * time.Second,
 		Enviroment:          ENV_TEST,

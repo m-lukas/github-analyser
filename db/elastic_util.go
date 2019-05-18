@@ -3,27 +3,40 @@ package db
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"time"
-
-	"github.com/olivere/elastic"
 )
 
-func (elasticClient *ElasticClient) Insert() {
-
-}
-
-func (elasticClient *ElasticClient) Search(term string, index string, indexType string, fields ...string) ([]json.RawMessage, error) {
+//Insert a new document into the given elastic index
+func (elasticClient *ElasticClient) Insert(item interface{}, index string) (string, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	client := elasticClient.Client
-	query := elastic.NewMultiMatchQuery(term, fields...)
+	resp, err := client.Index().Index(index).BodyJson(item).Do(ctx)
+	if err != nil {
+		return "", err
+	}
 
-	searchResult, err := client.Search().Index(index).Type(indexType).Query(query).Do(ctx)
+	return resp.Id, nil
+}
+
+//Search for all documents in the index where the fields are matching the given search term
+func (elasticClient *ElasticClient) Search(term string, index string, fields ...string) ([]json.RawMessage, error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	client := elasticClient.Client
+	//query := elastic.NewMultiMatchQuery(term, fields...)
+
+	searchResult, err := client.Search().Index(index).From(0).Size(10).Do(ctx)
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Println(searchResult.TotalHits())
 
 	var rawData []json.RawMessage
 
@@ -39,6 +52,17 @@ func (elasticClient *ElasticClient) Search(term string, index string, indexType 
 	return rawData, nil
 }
 
-func (client *ElasticClient) Update() {
+//Update the document with the given id in the index using the provided map
+func (elasticClient *ElasticClient) Update(updateData map[string]interface{}, id string, index string) (string, error) {
 
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	client := elasticClient.Client
+	resp, err := client.Update().Index(index).Id(id).Doc(updateData).Do(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	return resp.Id, nil
 }
