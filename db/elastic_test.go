@@ -39,11 +39,17 @@ func Test_Elastic(t *testing.T) {
 	//check config for futher operations on the database
 	require.Equal(t, elasticClient.Config.Enviroment, ENV_TEST) //check for right db config
 
-	index := "user_index"
-	//drop test collection
+	index := "user_test_index"
 	client := elasticClient.Client
-	_, err = client.DeleteIndex(index).Do(ctx)
-	require.Nil(t, err, "index deletion failed")
+
+	exists, err := client.IndexExists(index).Do(ctx)
+	require.Nil(t, err, "index check failed")
+
+	//drop test collection
+	if exists {
+		_, err = client.DeleteIndex(index).Do(ctx)
+		require.Nil(t, err, "index deletion failed")
+	}
 
 	err = elasticClient.checkIndexes()
 	require.Nil(t, err, "index creation failed")
@@ -87,10 +93,10 @@ func Test_Elastic(t *testing.T) {
 		require.Nil(t, err, "update failed")
 		require.Equal(t, testUserID, id, "didn't return id @ update")
 
-		results, err := elasticClient.Search("CODE", index, "bio")
-		require.Nil(t, err, "search failed")
+		time.Sleep(1 * time.Second)
 
-		fmt.Println(results)
+		results, err := elasticClient.Search("code", index, "bio")
+		require.Nil(t, err, "search failed")
 
 		var dataSlice []*ElasticUser
 		for _, message := range results {
@@ -102,11 +108,10 @@ func Test_Elastic(t *testing.T) {
 
 		require.Equal(t, 1, len(dataSlice), "not enough or too many results")
 		require.Equal(t, "sindresorhus", dataSlice[0].Login, "search returns wrong results")
+
 	})
 
-	/*
-		_, err = client.DeleteIndex(index).Do(ctx)
-		require.Nil(t, err, "index deletion failed")
-	*/
+	_, err = client.DeleteIndex(index).Do(ctx)
+	require.Nil(t, err, "index deletion failed")
 
 }

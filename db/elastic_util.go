@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
+
+	"github.com/olivere/elastic/v7"
 )
 
 //Insert a new document into the given elastic index
@@ -29,9 +31,9 @@ func (elasticClient *ElasticClient) Search(term string, index string, fields ...
 	defer cancel()
 
 	client := elasticClient.Client
-	//query := elastic.NewMultiMatchQuery(term, fields...)
+	query := elastic.NewMultiMatchQuery(term, fields...)
 
-	searchResult, err := client.Search().Index(index).From(0).Size(10).Do(ctx)
+	searchResult, err := client.Search().Index(index).Query(query).Do(ctx)
 	if err != nil {
 		return nil, err
 	}

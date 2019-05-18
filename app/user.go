@@ -5,11 +5,10 @@ import (
 
 	"github.com/m-lukas/github-analyser/controller"
 	"github.com/m-lukas/github-analyser/db"
+	"github.com/m-lukas/github-analyser/httputil"
+	"github.com/m-lukas/github-analyser/translate"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-
-	"bitbucket.org/timbertom/backend/httputil"
-	"bitbucket.org/timbertom/backend/translate"
 )
 
 type scoreResponse struct {

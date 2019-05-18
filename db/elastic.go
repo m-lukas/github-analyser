@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/m-lukas/github-analyser/util"
-	"github.com/olivere/elastic"
+	"github.com/olivere/elastic/v7"
 )
 
 //ElasticClient contains the elastic db client, its config and the default database

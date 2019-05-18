@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"bitbucket.org/timbertom/backend/httputil"
-	"bitbucket.org/timbertom/backend/translate"
 	"github.com/go-chi/chi"
+	"github.com/m-lukas/github-analyser/httputil"
+	"github.com/m-lukas/github-analyser/translate"
 )
 
 func InitUserRoutes(router *chi.Mux, basePath string) {
