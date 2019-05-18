@@ -5,11 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
-<<<<<<< HEAD
-=======
 
 	"github.com/olivere/elastic/v7"
->>>>>>> Implement go modules
 )
 
 //Insert a new document into the given elastic index
@@ -27,23 +24,16 @@ func (elasticClient *ElasticClient) Insert(item interface{}, index string) (stri
 	return resp.Id, nil
 }
 
-<<<<<<< HEAD
 //Search for all documents in the index where the fields are matching the given search term
-=======
->>>>>>> Implement go modules
 func (elasticClient *ElasticClient) Search(term string, index string, fields ...string) ([]json.RawMessage, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	client := elasticClient.Client
-	//query := elastic.NewMultiMatchQuery(term, fields...)
+	query := elastic.NewMultiMatchQuery(term, fields...)
 
-<<<<<<< HEAD
-	searchResult, err := client.Search().Index(index).From(0).Size(10).Do(ctx)
-=======
 	searchResult, err := client.Search().Index(index).Query(query).Do(ctx)
->>>>>>> Implement go modules
 	if err != nil {
 		return nil, err
 	}
