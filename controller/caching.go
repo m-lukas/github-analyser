@@ -34,6 +34,31 @@ func CacheUser(user *db.User, collectionName string) error {
 		Bio:   user.Bio,
 	}
 
+	var elasticID string
+
+	if len(elasticResultList) == 0 {
+
+		id, err := elasticClient.Insert(elasticUser, elasticIndex)
+		if err != nil {
+			return err
+		}
+
+		elasticID = id
+	}else{
+
+		var dataSlice []*ElasticUser
+		for _, message := range results {
+			var userData ElasticUser
+			err = json.Unmarshal(message, &userData)
+			require.Nil(t, err, "can't unmarshal search result")
+			dataSlice = append(dataSlice, &userData)
+		}
+
+	}
+
+
+
+
 	if mongoUser == nil && len(elasticResultList) == 0 {
 
 		elasticId, err := elasticClient.Insert(elasticUser, elasticIndex)
@@ -48,6 +73,11 @@ func CacheUser(user *db.User, collectionName string) error {
 		if err != nil {
 			return err
 		}
+
+	}else if mongoUser != nil && len(elasticResultList) == 0 {
+
+
+
 
 	}
 
