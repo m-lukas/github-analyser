@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -33,12 +34,15 @@ func Test_Caching(t *testing.T) {
 	collectionName := "test_caching"
 	_, collection := setupMongoTest(t, db.TestRoot, collectionName, ctx)
 
+	elasticClient := setupElasticTest(t, db.TestRoot, ctx)
+
 	t.Run("CacheUser(): user couldn't be cached", func(t *testing.T) {
 		err = CacheUser(testUser, collectionName)
 		require.Nil(t, err, "failed to cache user")
 
 		//cache user twice to check for duplicates
 		err = CacheUser(testUser, collectionName)
+		fmt.Println(err)
 		require.Nil(t, err, "failed to cache user")
 
 		//count documents in collection to check duplicates
@@ -73,6 +77,9 @@ func Test_Caching(t *testing.T) {
 	})
 
 	clearMongoTestCollection(t, collection, ctx)
+
+	_, err = elasticClient.Client.DeleteIndex(elasticClient.Config.DefaultIndex).Do(ctx)
+	require.Nil(t, err, "index deletion failed")
 
 	db.TestRoot = nil
 }

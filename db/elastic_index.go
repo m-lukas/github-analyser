@@ -19,7 +19,7 @@ func (client *ElasticClient) initIndexes() {
 
 }
 
-func (elasticClient *ElasticClient) checkIndexes() error {
+func (elasticClient *ElasticClient) CheckIndexes() error {
 
 	client := elasticClient.Client
 

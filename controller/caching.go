@@ -44,44 +44,36 @@ func CacheUser(user *db.User, collectionName string) error {
 		}
 
 		elasticID = id
-	}else{
 
-		var dataSlice []*ElasticUser
-		for _, message := range results {
-			var userData ElasticUser
-			err = json.Unmarshal(message, &userData)
-			require.Nil(t, err, "can't unmarshal search result")
-			dataSlice = append(dataSlice, &userData)
-		}
+	} else {
 
-	}
-
-
-
-
-	if mongoUser == nil && len(elasticResultList) == 0 {
-
-		elasticId, err := elasticClient.Insert(elasticUser, elasticIndex)
+		elasticUsers, err := db.ConvertUsers(elasticResultList)
 		if err != nil {
 			return err
 		}
 
-		user.ElasticID = elasticId
+		var elasticUser *db.ElasticUser
 
-		//insert new user into collection if not existing
-		err = mongoClient.Insert(user, collectionName)
+		//take first, delete others
+		for _, userObj := range elasticUsers {
+			if userObj.Login == user.Login {
+				elasticUser = userObj
+				break
+				//TODO: Delete + own function to increase readness
+			}
+		}
+
+		id, err := elasticClient.Update(map[string]interface{}{"bio": user.Bio}, elasticUser.Id, elasticIndex)
 		if err != nil {
 			return err
 		}
 
-	}else if mongoUser != nil && len(elasticResultList) == 0 {
-
-
-
-
+		elasticID = id
 	}
 
-	if dbUser != nil {
+	user.ElasticID = elasticID
+
+	if mongoUser != nil {
 		//updata user if existing
 		filter := bson.D{{"login", user.Login}}
 		err = mongoClient.UpdateAll(filter, user, collectionName)
@@ -90,6 +82,12 @@ func CacheUser(user *db.User, collectionName string) error {
 		}
 
 	} else {
+
+		//insert new user into collection if not existing
+		err = mongoClient.Insert(user, collectionName)
+		if err != nil {
+			return err
+		}
 
 	}
 

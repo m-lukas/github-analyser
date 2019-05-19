@@ -31,6 +31,8 @@ func Test_App(t *testing.T) {
 	collectionName := "test_getuser"
 	mongoClient, collection := setupMongoTest(t, db.TestRoot, collectionName, ctx)
 
+	elasticClient := setupElasticTest(t, db.TestRoot, ctx)
+
 	//Insert test data
 	err = mongoClient.Insert(&db.User{Login: "test1", Bio: "keyword"}, collectionName)
 	require.Nil(t, err)
@@ -150,6 +152,10 @@ func Test_App(t *testing.T) {
 
 	clearMongoTestCollection(t, collection, ctx)
 
+	_, err = elasticClient.Client.DeleteIndex(elasticClient.Config.DefaultIndex).Do(ctx)
+	require.Nil(t, err, "index deletion failed")
+
+	db.TestRoot = nil
 }
 
 //https://github.com/go-chi/chi/blob/master/mux_test.go

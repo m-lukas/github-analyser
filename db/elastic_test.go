@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"testing"
 	"time"
@@ -51,7 +50,7 @@ func Test_Elastic(t *testing.T) {
 		require.Nil(t, err, "index deletion failed")
 	}
 
-	err = elasticClient.checkIndexes()
+	err = elasticClient.CheckIndexes()
 	require.Nil(t, err, "index creation failed")
 
 	testSlice := []*ElasticUser{
@@ -98,13 +97,8 @@ func Test_Elastic(t *testing.T) {
 		results, err := elasticClient.Search("code", index, "bio")
 		require.Nil(t, err, "search failed")
 
-		var dataSlice []*ElasticUser
-		for _, message := range results {
-			var userData ElasticUser
-			err = json.Unmarshal(message, &userData)
-			require.Nil(t, err, "can't unmarshal search result")
-			dataSlice = append(dataSlice, &userData)
-		}
+		dataSlice, err := ConvertUsers(results)
+		require.Nil(t, err, "can't unmarshal search result")
 
 		require.Equal(t, 1, len(dataSlice), "not enough or too many results")
 		require.Equal(t, "sindresorhus", dataSlice[0].Login, "search returns wrong results")

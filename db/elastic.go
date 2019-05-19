@@ -89,7 +89,7 @@ func (root *DatabaseRoot) InitElasticClient() error {
 	root.ElasticClient = elasticClient
 
 	elasticClient.initIndexes()
-	err = elasticClient.checkIndexes()
+	err = elasticClient.CheckIndexes()
 	if err != nil {
 		return err
 	}

@@ -127,19 +127,23 @@ func doGetPreviousUsersByScore(score int, entries int, collectionName string) (*
 	return &result, nil
 }
 
-func doSearch(query string, collectionName string) (*UserSearchAggregationResponse, *httputil.ErrorResponse) {
+func doSearch(query string, collectionName string) ([]*db.ElasticUser, *httputil.ErrorResponse) {
 
-	pipeline := db.Pipeline{}
-
-	pipeline.Add(bson.D{{"$match", bson.D{{"$text", bson.D{{"$search", query}}}}}})
-
-	var result UserSearchAggregationResponse
-
-	err := pipeline.Run(&result, collectionName)
+	elasticClient, err := db.GetElastic()
 	if err != nil {
-		log.Println(err)
+		return nil, httputil.FromTranslationKey(500, translate.ServerError)
+	}
+	elasticIndex := elasticClient.Config.DefaultIndex
+
+	rawList, err := elasticClient.Search(query, elasticIndex, "login", "email", "name", "bio")
+	if err != nil {
 		return nil, httputil.FromTranslationKey(500, translate.ServerError)
 	}
 
-	return &result, nil
+	results, err := db.ConvertUsers(rawList)
+	if err != nil {
+		return nil, httputil.FromTranslationKey(500, translate.ServerError)
+	}
+
+	return results, nil
 }
