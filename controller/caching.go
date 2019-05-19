@@ -12,9 +12,45 @@ func CacheUser(user *db.User, collectionName string) error {
 	if err != nil {
 		return err
 	}
+	elasticClient, err := db.GetElastic()
+	if err != nil {
+		return err
+	}
+	elasticIndex := elasticClient.Config.DefaultIndex
 
 	//check if user with login exists in collection
-	dbUser, err := mongoClient.FindUser(user.Login, collectionName)
+	mongoUser, _ := mongoClient.FindUser(user.Login, collectionName)
+	//not found throws unspecific error as well as connection issues
+
+	elasticResultList, err := elasticClient.Search(user.Login, elasticIndex, "login")
+	if err != nil {
+		return err
+	}
+
+	elasticUser := &db.ElasticUser{
+		Login: user.Login,
+		Email: user.Email,
+		Name:  user.Name,
+		Bio:   user.Bio,
+	}
+
+	if mongoUser == nil && len(elasticResultList) == 0 {
+
+		elasticId, err := elasticClient.Insert(elasticUser, elasticIndex)
+		if err != nil {
+			return err
+		}
+
+		user.ElasticID = elasticId
+
+		//insert new user into collection if not existing
+		err = mongoClient.Insert(user, collectionName)
+		if err != nil {
+			return err
+		}
+
+	}
+
 	if dbUser != nil {
 		//updata user if existing
 		filter := bson.D{{"login", user.Login}}
@@ -24,11 +60,7 @@ func CacheUser(user *db.User, collectionName string) error {
 		}
 
 	} else {
-		//insert new user into collection if not existing
-		err = mongoClient.Insert(user, collectionName)
-		if err != nil {
-			return err
-		}
+
 	}
 
 	return nil
