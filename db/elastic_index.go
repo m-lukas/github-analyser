@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	user_index      = "user_index"
-	user_index_test = "user_index_test"
+	user_index      = "users"
+	user_index_test = "users_test"
 )
 
 func (client *ElasticClient) initIndexes() {

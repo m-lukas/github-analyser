@@ -21,6 +21,7 @@ type ElasticClient struct {
 //ElasticConfig contains config to init elastic db client
 type ElasticConfig struct {
 	ElasticURI          string
+	DefaultIndex        string
 	SniffOpt            bool
 	HealthCheckInterval time.Duration
 	Enviroment          string
@@ -30,6 +31,7 @@ type ElasticConfig struct {
 func (client *ElasticClient) getDefaultConfig() *ElasticConfig {
 	return &ElasticConfig{
 		ElasticURI:          getElasticURI(),
+		DefaultIndex:        "users",
 		SniffOpt:            false,
 		HealthCheckInterval: 10 * time.Second,
 		Enviroment:          ENV_PROD,
@@ -40,6 +42,7 @@ func (client *ElasticClient) getDefaultConfig() *ElasticConfig {
 func (client *ElasticClient) getTestConfig() *ElasticConfig {
 	return &ElasticConfig{
 		ElasticURI:          "http://localhost:9200",
+		DefaultIndex:        "users_test",
 		SniffOpt:            false,
 		HealthCheckInterval: 10 * time.Second,
 		Enviroment:          ENV_TEST,

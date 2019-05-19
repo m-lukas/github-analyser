@@ -39,7 +39,7 @@ func Test_Elastic(t *testing.T) {
 	//check config for futher operations on the database
 	require.Equal(t, elasticClient.Config.Enviroment, ENV_TEST) //check for right db config
 
-	index := "user_test_index"
+	index := elasticClient.Config.DefaultIndex
 	client := elasticClient.Client
 
 	exists, err := client.IndexExists(index).Do(ctx)
