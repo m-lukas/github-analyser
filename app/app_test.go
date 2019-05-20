@@ -32,6 +32,7 @@ func Test_App(t *testing.T) {
 	mongoClient, collection := setupMongoTest(t, db.TestRoot, collectionName, ctx)
 
 	elasticClient := setupElasticTest(t, db.TestRoot, ctx)
+	elasticIndex := elasticClient.Config.DefaultIndex
 
 	//Insert test data
 	err = mongoClient.Insert(&db.User{Login: "test1", Bio: "keyword"}, collectionName)
@@ -43,6 +44,9 @@ func Test_App(t *testing.T) {
 	err = mongoClient.Insert(&db.User{Login: "test4", Bio: "something", ActivityScore: 87.9, PopularityScore: 66.78}, collectionName)
 	require.Nil(t, err)
 	err = mongoClient.Insert(&db.User{Login: "test5", Bio: "It's a bio!", ActivityScore: 55.1, PopularityScore: 33.23}, collectionName)
+	require.Nil(t, err)
+
+	_, err = elasticClient.Insert(&db.ElasticUser{Login: "testE", Bio: "This is for CODE!"}, elasticIndex)
 	require.Nil(t, err)
 
 	//setTestScoreConfig(db.TestRoot)
@@ -139,16 +143,13 @@ func Test_App(t *testing.T) {
 
 	//ENDPOINT:	/search
 
-	//NO TEXTINDEX IN TEST_COLLECTION
-	/*
-		t.Run("/search", func(t *testing.T) {
-			//cannot send request to github endpoint and has to use cache
-			resp, body, err := testRequest(testServer, "GET", "/search?query=code", nil)
-			require.Nil(t, err)
-			require.Equal(t, 200, resp.StatusCode)
-			require.Contains(t, body, `code`)
-		})
-	*/
+	time.Sleep(1 * time.Second)
+	t.Run("/search", func(t *testing.T) {
+		resp, body, err := testRequest(testServer, "GET", "/api/search?query=CODE", nil)
+		require.Nil(t, err)
+		require.Equal(t, 200, resp.StatusCode)
+		require.Contains(t, body, `CODE`)
+	})
 
 	clearMongoTestCollection(t, collection, ctx)
 

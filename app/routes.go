@@ -112,14 +112,12 @@ func InitUserRoutes(router *chi.Mux, basePath string) {
 
 	})
 
-	router.Route("/search", func(r chi.Router) {
+	router.Route(basePath+"/search", func(r chi.Router) {
 
 		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 			query := getQueryParam(r, "search")
 
-			collectionName := getUserCollectionName()
-
-			resp, err := doSearch(query, collectionName)
+			resp, err := doSearch(query)
 			if err != nil {
 				err.Write(w)
 				return

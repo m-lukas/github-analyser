@@ -127,20 +127,9 @@ func doGetPreviousUsersByScore(score int, entries int, collectionName string) (*
 	return &result, nil
 }
 
-func doSearch(query string, collectionName string) ([]*db.ElasticUser, *httputil.ErrorResponse) {
+func doSearch(query string) ([]*db.ElasticUser, *httputil.ErrorResponse) {
 
-	elasticClient, err := db.GetElastic()
-	if err != nil {
-		return nil, httputil.FromTranslationKey(500, translate.ServerError)
-	}
-	elasticIndex := elasticClient.Config.DefaultIndex
-
-	rawList, err := elasticClient.Search(query, elasticIndex, "login", "email", "name", "bio")
-	if err != nil {
-		return nil, httputil.FromTranslationKey(500, translate.ServerError)
-	}
-
-	results, err := db.ConvertUsers(rawList)
+	results, err := controller.SearchUser(query)
 	if err != nil {
 		return nil, httputil.FromTranslationKey(500, translate.ServerError)
 	}
