@@ -5,8 +5,8 @@ import (
 
 	"github.com/m-lukas/github-analyser/controller"
 	"github.com/m-lukas/github-analyser/db"
+	"github.com/m-lukas/github-analyser/errorutil"
 	"github.com/m-lukas/github-analyser/httputil"
-	"github.com/m-lukas/github-analyser/translate"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -34,13 +34,14 @@ type UserSearchAggregationResponse struct {
 func doGetUser(userName string) (*db.User, *httputil.ErrorResponse) {
 
 	if userName == "" {
-		return nil, httputil.FromTranslationKey(400, translate.MissingParameter)
+		resp := httputil.NewError(httputil.INVALID_ARGUMENTS, errorutil.NullOrEmptyError{Param: "userName"}.Error())
+		return nil, resp
 	}
 
 	user, err := controller.GetUser(userName)
 	if err != nil {
 		log.Println(err)
-		return nil, httputil.FromTranslationKey(500, translate.ServerError)
+		return nil, httputil.NewError(httputil.SERVER_ERROR, errorutil.InternalServerError)
 	}
 
 	return user, nil
@@ -50,13 +51,14 @@ func doGetUser(userName string) (*db.User, *httputil.ErrorResponse) {
 func doGetScore(userName string) (*scoreResponse, *httputil.ErrorResponse) {
 
 	if userName == "" {
-		return nil, httputil.FromTranslationKey(400, translate.MissingParameter)
+		resp := httputil.NewError(httputil.INVALID_ARGUMENTS, errorutil.NullOrEmptyError{Param: "userName"}.Error())
+		return nil, resp
 	}
 
 	user, err := controller.GetUser(userName)
 	if err != nil {
 		log.Println(err)
-		return nil, httputil.FromTranslationKey(500, translate.ServerError)
+		return nil, httputil.NewError(httputil.SERVER_ERROR, errorutil.InternalServerError)
 	}
 
 	resp := &scoreResponse{
@@ -81,7 +83,7 @@ func doGetNearestUserByScore(score int, collectionName string) (*ActivityAggrega
 	err := pipeline.Run(&result, collectionName)
 	if err != nil {
 		log.Println(err)
-		return nil, httputil.FromTranslationKey(500, translate.ServerError)
+		return nil, httputil.NewError(httputil.SERVER_ERROR, errorutil.InternalServerError)
 	}
 
 	return &result, nil
@@ -101,7 +103,7 @@ func doGetNextUsersByScore(score int, entries int, collectionName string) (*Acti
 	err := pipeline.Run(&result, collectionName)
 	if err != nil {
 		log.Println(err)
-		return nil, httputil.FromTranslationKey(500, translate.ServerError)
+		return nil, httputil.NewError(httputil.SERVER_ERROR, errorutil.InternalServerError)
 	}
 
 	return &result, nil
@@ -121,7 +123,7 @@ func doGetPreviousUsersByScore(score int, entries int, collectionName string) (*
 	err := pipeline.Run(&result, collectionName)
 	if err != nil {
 		log.Println(err)
-		return nil, httputil.FromTranslationKey(500, translate.ServerError)
+		return nil, httputil.NewError(httputil.SERVER_ERROR, errorutil.InternalServerError)
 	}
 
 	return &result, nil
@@ -131,7 +133,7 @@ func doSearch(query string) ([]*db.ElasticUser, *httputil.ErrorResponse) {
 
 	results, err := controller.SearchUser(query)
 	if err != nil {
-		return nil, httputil.FromTranslationKey(500, translate.ServerError)
+		return nil, httputil.NewError(httputil.SERVER_ERROR, errorutil.InternalServerError)
 	}
 
 	return results, nil
