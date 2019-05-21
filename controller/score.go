@@ -75,6 +75,7 @@ func UpdateAllScores() error {
 	return nil
 }
 
+//calcActivityScore aggregates ActivityScore from all minor scores
 func calcActivityScore(scores *db.Scores, config *db.ScoreParams) float64 {
 	var score = 0.0
 
@@ -98,6 +99,7 @@ func calcActivityScore(scores *db.Scores, config *db.ScoreParams) float64 {
 	return score
 }
 
+//calcPopularityScore aggregates PopularityScore from all minor scores
 func calcPopularityScore(scores *db.Scores, config *db.ScoreParams) float64 {
 	var score = 0.0
 
@@ -110,6 +112,7 @@ func calcPopularityScore(scores *db.Scores, config *db.ScoreParams) float64 {
 	return score
 }
 
+//calcScore calculates all minor scores using the score function
 func calcScores(user *db.User, config *db.ScoreParams) *db.Scores {
 
 	scores := &db.Scores{
@@ -135,6 +138,7 @@ func calcScores(user *db.User, config *db.ScoreParams) *db.Scores {
 	return scores
 }
 
+//scoreFunc returns the score by using the pre-calculated k and the fields value
 func scoreFunc(x float64, k float64) float64 {
 	return x / (0.01*x + k)
 }

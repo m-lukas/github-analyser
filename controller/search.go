@@ -4,6 +4,7 @@ import (
 	"github.com/m-lukas/github-analyser/db"
 )
 
+//SearchUser searches multiple fields in the default elastic index for the given search query
 func SearchUser(query string) ([]*db.ElasticUser, error) {
 
 	elasticClient, err := db.GetElastic()
@@ -17,6 +18,7 @@ func SearchUser(query string) ([]*db.ElasticUser, error) {
 		return nil, err
 	}
 
+	//unmarshal json response into ElasticUser list
 	results, err := db.ConvertUsers(rawList)
 	if err != nil {
 		return nil, err

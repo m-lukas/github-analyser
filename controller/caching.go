@@ -22,6 +22,7 @@ func CacheUser(user *db.User, collectionName string) error {
 	mongoUser, _ := mongoClient.FindUser(user.Login, collectionName)
 	//not found throws unspecific error as well as connection issues
 
+	//get user from elastic
 	elasticResultList, err := elasticClient.Search(user.Login, elasticIndex, "login")
 	if err != nil {
 		return err
@@ -34,10 +35,13 @@ func CacheUser(user *db.User, collectionName string) error {
 		Bio:   user.Bio,
 	}
 
+	//elasticID for savining into mongo
 	var elasticID string
 
+	//check if user exists
 	if len(elasticResultList) == 0 {
 
+		//if user doesn't exist, insert new document
 		id, err := elasticClient.Insert(elasticUser, elasticIndex)
 		if err != nil {
 			return err
@@ -47,6 +51,7 @@ func CacheUser(user *db.User, collectionName string) error {
 
 	} else {
 
+		//COMMENTED OUT BECAUSE OF ISSUE WITH ELASTIC PACKAGE
 		/*
 			elasticUsers, err := db.ConvertUsers(elasticResultList)
 			if err != nil {
@@ -74,11 +79,13 @@ func CacheUser(user *db.User, collectionName string) error {
 		//elasticID = id
 	}
 
+	//update user object
 	user.ElasticID = elasticID
 
+	//check if user was already saved into mongo
 	if mongoUser != nil {
-		//updata user if existing
 
+		//updata user if existing
 		filter := bson.D{{"login", user.Login}}
 		err = mongoClient.UpdateAll(filter, user, collectionName)
 		if err != nil {

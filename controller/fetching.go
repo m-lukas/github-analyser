@@ -8,12 +8,14 @@ import (
 	"github.com/m-lukas/github-analyser/graphql"
 )
 
+//fetchUser runs all github queries for fetching the user data
 func fetchUser(userName string) (*db.User, error) {
 
+	//channels for retrieving responses of goroutines
 	generalChannel := make(chan graphql.GeneralDataResponse)
 	commitChannel := make(chan graphql.CommitDataResponse)
 
-	var startTime = time.Now()
+	var startTime = time.Now() //startTime for timeout
 
 	go func(userName string) {
 		generalChannel <- graphql.GetGeneralData(userName)
@@ -26,6 +28,7 @@ func fetchUser(userName string) (*db.User, error) {
 	var generalData *graphql.GeneralData
 	var commitData *graphql.CommitData
 
+	//receiving responses from channels
 	for {
 		select {
 		case resp := <-generalChannel:
@@ -44,20 +47,24 @@ func fetchUser(userName string) (*db.User, error) {
 				commitData = resp.Data
 			}
 
+		//reduce speed of for loop
 		case <-time.After(50 * time.Millisecond):
 			break
 		}
 
+		//check if all channels replied
 		if generalData != nil && commitData != nil {
 			break
 		}
 
+		//check for timeout
 		if time.Since(startTime).Seconds() >= float64(timoutSeconds) {
 			return nil, errors.New("Timeout while trying to receive data!")
 		}
 
 	}
 
+	//translate responses to user object
 	user := &db.User{
 		Login:                     generalData.Login,
 		Name:                      generalData.Name,
