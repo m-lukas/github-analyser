@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/m-lukas/github-analyser/db"
+	"github.com/m-lukas/github-analyser/logger"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -68,7 +69,7 @@ func UpdateAllScores() error {
 			return err
 		}
 
-		fmt.Printf("Updated score for user: %s\n", user.Login)
+		logger.Info(fmt.Sprintf("Updated score for user: %s\n", user.Login))
 	}
 
 	return nil

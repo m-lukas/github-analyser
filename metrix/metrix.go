@@ -6,6 +6,7 @@ import (
 
 	"github.com/m-lukas/github-analyser/controller"
 	"github.com/m-lukas/github-analyser/db"
+	"github.com/m-lukas/github-analyser/logger"
 	"github.com/m-lukas/github-analyser/util"
 )
 
@@ -34,7 +35,7 @@ const (
 func CalcScoreParams() error {
 
 	startTime := time.Now()
-	fmt.Printf("%s Start time: %s\n", prefix, util.FormatDuration(time.Since(startTime)))
+	logger.Info(fmt.Sprintf("%s Start time: %s\n", prefix, util.FormatDuration(time.Since(startTime))))
 
 	inputFiles := []string{"./metrix/input/sindresorhus.txt"}
 	userArray, err := populateData(inputFiles)
@@ -60,26 +61,25 @@ func CalcScoreParams() error {
 		return err
 	}
 
-	fmt.Printf("%s Successfully saved user data!\n", prefix)
+	logger.Info(fmt.Sprintf("%s Successfully saved user data!\n", prefix))
 
 	err = db.ReinitializeScoreConfig()
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("%s Reinitialized score config!\n", prefix)
+	logger.Info(fmt.Sprintf("%s Reinitialized score config!\n", prefix))
 
 	err = controller.UpdateAllScores()
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("%s FINISHED!\n", prefix)
+	logger.Info(fmt.Sprintf("%s Finished metrix initialization!\n", prefix))
 
-	fmt.Printf("%s End time: %s\n", prefix, util.FormatDuration(time.Since(startTime)))
+	logger.Info(fmt.Sprintf("%s End time: %s\n", prefix, util.FormatDuration(time.Since(startTime))))
 
 	return nil
-
 }
 
 func fieldTypes() map[string]string {

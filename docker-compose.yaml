@@ -23,7 +23,7 @@ services:
     container_name: github_analyser_elastic
     environment:
       - discovery.type=single-node
-    volumes:
-      - .data/elastic:/data/elastic
     ports:
       - 9200:9200
+    volumes:
+      - .data/elastic:/data/elastic

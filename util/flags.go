@@ -2,9 +2,10 @@ package util
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strings"
+
+	"github.com/m-lukas/github-analyser/logger"
 )
 
 func IsTesting() bool {
@@ -19,13 +20,13 @@ func ReadBoolFlag(flagName string) bool {
 
 	switch flag {
 	case "0":
-		log.Println(fmt.Sprintf("%s IS DISABLED.", flagName))
+		logger.Warn(fmt.Sprintf("%s IS DISABLED.", flagName))
 		return false
 	case "1":
-		log.Println(fmt.Sprintf("%s IS ENABLED.", flagName))
+		logger.Warn(fmt.Sprintf("%s IS ENABLED.", flagName))
 		return true
 	default:
-		log.Println(fmt.Sprintf("%s IS DISABLED.", flagName))
+		logger.Warn(fmt.Sprintf("%s IS DISABLED.", flagName))
 		return false
 	}
 }

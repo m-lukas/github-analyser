@@ -9,11 +9,11 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"time"
 
+	"github.com/m-lukas/github-analyser/logger"
 	"github.com/m-lukas/github-analyser/util"
 )
 
@@ -117,7 +117,7 @@ func (c *Client) run(ctx context.Context, request *Request, responseData interfa
 	}
 
 	if response.Errors != nil {
-		log.Println(response.Errors)
+		logger.Error(fmt.Sprintf("Retrieved a GraphQL error: %v", response.Errors))
 		return errors.New("Retrieved a GraphQL error!")
 	}
 

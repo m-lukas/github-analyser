@@ -12,6 +12,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/m-lukas/github-analyser/app"
 	"github.com/m-lukas/github-analyser/db"
+	"github.com/m-lukas/github-analyser/logger"
 	"github.com/m-lukas/github-analyser/mailer"
 	"github.com/m-lukas/github-analyser/util"
 
@@ -61,14 +62,14 @@ func runServer(server *Server) {
 			log.Fatal(err)
 		}
 	}()
-	log.Println(fmt.Sprintf(`Server has been started on port: %d`, server.Config.Port))
+	logger.Info(fmt.Sprintf(`Server has been started on port: %d`, server.Config.Port))
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 
 	<-c
 
-	log.Println("Server was stopped!")
+	logger.Warn("Server was stopped!")
 	os.Exit(0)
 }
 
@@ -111,7 +112,7 @@ func main() {
 	handler := app.HandleCors(server.Router)
 	server.HTTPServer = configHTTPServer(server.Config, handler)
 
-	log.Println("Server has been configurated!")
+	logger.Info("Server has been configurated!")
 
 	runServer(server)
 }

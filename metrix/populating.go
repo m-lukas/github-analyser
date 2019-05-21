@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/m-lukas/github-analyser/logger"
 	"github.com/m-lukas/github-analyser/util"
 
 	"github.com/m-lukas/github-analyser/controller"
@@ -39,7 +40,7 @@ func populateData(filepaths []string) ([]*db.User, error) {
 
 func queryUserData(inputArray []string) []*db.User {
 
-	fmt.Printf("%s --- STARTING TO QUERY USERS ---\n", prefix)
+	logger.Info(fmt.Sprintf("%s --- STARTING TO QUERY USERS ---", prefix))
 	var queriedUsers []*db.User
 
 	var numberOfResponses = 0
@@ -81,15 +82,8 @@ func queryUserData(inputArray []string) []*db.User {
 				numberOfResponse++
 				numberOfResponses++
 				if resp.Error != nil {
-					fmt.Printf("%s %d/%d Failed to get data of user: %s\n", prefix, numberOfResponses, queryLength, resp.Login)
-					fmt.Printf("%s %d/%d Trying to get user data from cache for: %s\n", prefix, numberOfResponses, queryLength, resp.Login)
-					dbData, err := controller.GetUserFromCache(resp.Login, "users")
-					if err != nil {
-						fmt.Printf("%s %d/%d Failed to get data of user: %s\n", prefix, numberOfResponses, queryLength, resp.Login)
-					} else {
-						querySuccessMessage(resp.Login, startTime, numberOfResponses, queryLength)
-						queriedUsers = append(queriedUsers, dbData)
-					}
+					logger.ErrorNoMail(fmt.Sprintf("%s %d/%d Failed to get data of user: %s", prefix, numberOfResponses, queryLength, resp.Login))
+					logger.ErrorNoMail(resp.Error.Error())
 				} else {
 					querySuccessMessage(resp.Login, startTime, numberOfResponses, queryLength)
 					queriedUsers = append(queriedUsers, resp.User)
@@ -101,8 +95,8 @@ func queryUserData(inputArray []string) []*db.User {
 			}
 
 			if numberOfResponse == blockSize {
-				fmt.Printf("%s --- COOLDOWN: %ds ---\n", prefix, cooldown)
-				fmt.Printf("%s --- TIME: %s ---\n", prefix, util.FormatDuration(time.Since(startTime)))
+				logger.Info(fmt.Sprintf("%s --- COOLDOWN: %ds ---", prefix, cooldown))
+				logger.Info(fmt.Sprintf("%s --- TIME: %s ---", prefix, util.FormatDuration(time.Since(startTime))))
 				break
 			}
 
@@ -112,12 +106,12 @@ func queryUserData(inputArray []string) []*db.User {
 
 	}
 
-	fmt.Printf("%s --- FINISHED QUERYING USERS ---\n", prefix)
+	logger.Info(fmt.Sprintf("%s --- FINISHED QUERYING USERS ---", prefix))
 
 	return queriedUsers
 
 }
 
 func querySuccessMessage(login string, startTime time.Time, n int, overall int) {
-	fmt.Printf("%s %d/%d User: %s, Time: %s\n", prefix, n, overall, login, util.FormatDuration(time.Since(startTime)))
+	logger.Info(fmt.Sprintf("%s %d/%d User: %s, Time: %s", prefix, n, overall, login, util.FormatDuration(time.Since(startTime))))
 }

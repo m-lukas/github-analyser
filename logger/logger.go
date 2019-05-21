@@ -8,10 +8,27 @@ import (
 )
 
 const (
-	ERROR = "ERROR"
-	WARN  = "WARN"
-	INFO  = "INFO"
+	TYPE_ERROR         = "ERROR"
+	TYPE_ERROR_NO_MAIL = "ERROR*"
+	TYPE_WARN          = "WARN"
+	TYPE_INFO          = "INFO"
 )
+
+func Info(message string) {
+	Log(TYPE_INFO, message)
+}
+
+func Warn(message string) {
+	Log(TYPE_WARN, message)
+}
+
+func Error(message string) {
+	Log(TYPE_ERROR, message)
+}
+
+func ErrorNoMail(message string) {
+	Log(TYPE_ERROR_NO_MAIL, message)
+}
 
 func Log(logType string, message string) {
 
@@ -19,19 +36,26 @@ func Log(logType string, message string) {
 	var c string
 
 	reset := "\u001b[0m"
-	red := "\u001b[1m\u001b[31;1m"
-	green := "\u001b[1m\u001b[32;1m"
-	yellow := "\u001b[1m\u001b[33;1m"
+	red := "\u001b[31;1m"
+	green := "\u001b[32;1m"
+	yellow := "\u001b[33;1m"
+	white := "\u001b[37;1m"
 
 	switch logType {
-	case WARN:
+	case TYPE_INFO:
+		c = green
+		sendMail = false
+	case TYPE_WARN:
 		c = yellow
 		sendMail = false
-	case ERROR:
+	case TYPE_ERROR:
 		c = red
 		sendMail = true
+	case TYPE_ERROR_NO_MAIL:
+		c = red
+		sendMail = false
 	default:
-		c = green
+		c = white
 		sendMail = false
 	}
 

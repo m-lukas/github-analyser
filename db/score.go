@@ -2,7 +2,8 @@ package db
 
 import (
 	"errors"
-	"log"
+
+	"github.com/m-lukas/github-analyser/logger"
 )
 
 //InitScoreConfig retrieves the ScoreParams from redis and assigns it to the database root.
@@ -98,7 +99,7 @@ func (root *DatabaseRoot) InitScoreConfig() error {
 	}
 
 	root.ScoreConfig = scoreConfig
-	log.Println("Initialized score config!")
+	logger.Info("Initialized score config!")
 
 	return nil
 

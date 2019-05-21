@@ -2,11 +2,11 @@ package db
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"time"
 
+	"github.com/m-lukas/github-analyser/logger"
 	"github.com/m-lukas/github-analyser/util"
 	"github.com/olivere/elastic/v7"
 )
@@ -67,11 +67,10 @@ func (root *DatabaseRoot) InitElasticClient() error {
 		elastic.SetURL(config.ElasticURI),
 		elastic.SetSniff(config.SniffOpt),
 		elastic.SetHealthcheckInterval(config.HealthCheckInterval),
-		elastic.SetErrorLog(log.New(os.Stderr, "ELASTIC ", log.LstdFlags)),
-		elastic.SetInfoLog(log.New(os.Stdout, "", log.LstdFlags)),
+		elastic.SetErrorLog(log.New(os.Stderr, "[ELASTIC-ERROR] ", log.LstdFlags)),
+		//elastic.SetInfoLog(log.New(os.Stdout, "", log.LstdFlags)),
 	)
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 
@@ -94,8 +93,7 @@ func (root *DatabaseRoot) InitElasticClient() error {
 		return err
 	}
 
-	log.Println("Initialized elastic client!")
-
+	logger.Info("Initialized elastic client!")
 	return nil
 }
 

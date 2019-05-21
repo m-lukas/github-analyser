@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/m-lukas/github-analyser/logger"
 	"github.com/m-lukas/github-analyser/util"
 
 	"github.com/m-lukas/github-analyser/graphql"
@@ -19,12 +20,14 @@ func SetupInputFile(rootUser string) error {
 		return err
 	}
 
-	fmt.Printf("%s Successfully retrived data from GitHub!\n", prefix)
+	logger.Info(fmt.Sprintf("%s Successfully retrived data from GitHub!", prefix))
 
 	err = util.WriteFile(fmt.Sprintf("./metrix/input/%s.txt", rootUser), inputArray)
 	if err != nil {
 		return err
 	}
+
+	logger.Info(fmt.Sprintf("%s Successfully wrote input files!", prefix))
 
 	return nil
 
@@ -40,19 +43,21 @@ func apiCallWrapper(rootUser string) ([]string, error) {
 
 	inputArray, err = apiCall(rootUser)
 
-	for err != nil {
+	for {
 
 		tryCount++
-		time.Sleep(time.Duration(cooldown) * time.Second)
 		inputArray, err = apiCall(rootUser)
 
-		if err != nil {
-			fmt.Printf("%s Failed to fetch data! COOLDOWN: %d seconds\n", prefix, cooldown)
+		if tryCount == maxTries {
+			return nil, errors.New("Exceeded number of tries in setup!")
 		}
 
-		if tryCount == maxTries {
-			return nil, errors.New("Exceded number of tries!")
+		if err == nil {
+			break
 		}
+
+		logger.Warn(fmt.Sprintf("%s Failed to fetch data! COOLDOWN: %d seconds [%d/%d]", prefix, cooldown, tryCount, maxTries))
+		time.Sleep(time.Duration(cooldown) * time.Second)
 
 	}
 

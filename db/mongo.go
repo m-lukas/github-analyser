@@ -3,10 +3,10 @@ package db
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"time"
 
+	"github.com/m-lukas/github-analyser/logger"
 	"github.com/m-lukas/github-analyser/util"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -76,7 +76,7 @@ func (root *DatabaseRoot) InitMongoClient() error {
 	mongoClient.Database = client.Database(mongoClient.Config.MongoDatabaseName)
 
 	root.MongoClient = mongoClient
-	log.Println("Initialized mongo client!")
+	logger.Info("Initialized mongo client!")
 
 	return nil
 }

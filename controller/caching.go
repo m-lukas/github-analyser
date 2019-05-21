@@ -47,34 +47,38 @@ func CacheUser(user *db.User, collectionName string) error {
 
 	} else {
 
-		elasticUsers, err := db.ConvertUsers(elasticResultList)
-		if err != nil {
-			return err
-		}
-
-		var elasticUser *db.ElasticUser
-
-		//take first, delete others
-		for _, userObj := range elasticUsers {
-			if userObj.Login == user.Login {
-				elasticUser = userObj
-				break
-				//TODO: Delete + own function to increase readness
+		/*
+			elasticUsers, err := db.ConvertUsers(elasticResultList)
+			if err != nil {
+				return err
 			}
-		}
 
-		id, err := elasticClient.Update(map[string]interface{}{"bio": user.Bio}, elasticUser.Id, elasticIndex)
-		if err != nil {
-			return err
-		}
+			var elasticUser *db.ElasticUser
 
-		elasticID = id
+			//take first, delete others
+			for _, userObj := range elasticUsers {
+				if userObj.Login == user.Login {
+					elasticUser = userObj
+					break
+					//TODO: Delete + own function to increase readness
+				}
+			}
+
+
+				id, err := elasticClient.Update(map[string]interface{}{"bio": user.Bio}, elasticUser.Id, elasticIndex)
+				if err != nil {
+					return err
+				}
+		*/
+
+		//elasticID = id
 	}
 
 	user.ElasticID = elasticID
 
 	if mongoUser != nil {
 		//updata user if existing
+
 		filter := bson.D{{"login", user.Login}}
 		err = mongoClient.UpdateAll(filter, user, collectionName)
 		if err != nil {

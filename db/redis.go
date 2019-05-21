@@ -1,10 +1,10 @@
 package db
 
 import (
-	"log"
 	"os"
 	"strconv"
 
+	"github.com/m-lukas/github-analyser/logger"
 	"github.com/m-lukas/github-analyser/util"
 
 	"github.com/go-redis/redis"
@@ -76,7 +76,7 @@ func (root *DatabaseRoot) InitRedisClient() error {
 
 	redisClient.Client = client
 	root.RedisClient = redisClient
-	log.Println("Initialized redis client!")
+	logger.Info("Initialized redis client!")
 
 	return nil
 

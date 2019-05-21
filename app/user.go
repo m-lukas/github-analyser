@@ -1,12 +1,13 @@
 package app
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/m-lukas/github-analyser/controller"
 	"github.com/m-lukas/github-analyser/db"
 	"github.com/m-lukas/github-analyser/errorutil"
 	"github.com/m-lukas/github-analyser/httputil"
+	"github.com/m-lukas/github-analyser/logger"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -40,7 +41,7 @@ func doGetUser(userName string) (*db.User, *httputil.ErrorResponse) {
 
 	user, err := controller.GetUser(userName)
 	if err != nil {
-		log.Println(err)
+		logger.Error(fmt.Sprintf("Failed to get user: %s, error: %s", user.Login, err.Error()))
 		return nil, httputil.NewError(httputil.SERVER_ERROR, errorutil.InternalServerError)
 	}
 
@@ -57,7 +58,7 @@ func doGetScore(userName string) (*scoreResponse, *httputil.ErrorResponse) {
 
 	user, err := controller.GetUser(userName)
 	if err != nil {
-		log.Println(err)
+		logger.Error(fmt.Sprintf("Failed to get user: %s, error: %s", user.Login, err.Error()))
 		return nil, httputil.NewError(httputil.SERVER_ERROR, errorutil.InternalServerError)
 	}
 
@@ -82,7 +83,7 @@ func doGetNearestUserByScore(score int, collectionName string) (*ActivityAggrega
 
 	err := pipeline.Run(&result, collectionName)
 	if err != nil {
-		log.Println(err)
+		logger.Error(fmt.Sprintf("Failed to run pipeline: %s, error: %s", "NearestByScore", err.Error()))
 		return nil, httputil.NewError(httputil.SERVER_ERROR, errorutil.InternalServerError)
 	}
 
@@ -102,7 +103,7 @@ func doGetNextUsersByScore(score int, entries int, collectionName string) (*Acti
 
 	err := pipeline.Run(&result, collectionName)
 	if err != nil {
-		log.Println(err)
+		logger.Error(fmt.Sprintf("Failed to run pipeline: %s, error: %s", "NextUserByScore", err.Error()))
 		return nil, httputil.NewError(httputil.SERVER_ERROR, errorutil.InternalServerError)
 	}
 
@@ -122,7 +123,7 @@ func doGetPreviousUsersByScore(score int, entries int, collectionName string) (*
 
 	err := pipeline.Run(&result, collectionName)
 	if err != nil {
-		log.Println(err)
+		logger.Error(fmt.Sprintf("Failed to run pipeline: %s, error: %s", "PreviousUserByScore", err.Error()))
 		return nil, httputil.NewError(httputil.SERVER_ERROR, errorutil.InternalServerError)
 	}
 
@@ -133,6 +134,7 @@ func doSearch(query string) ([]*db.ElasticUser, *httputil.ErrorResponse) {
 
 	results, err := controller.SearchUser(query)
 	if err != nil {
+		logger.Error(fmt.Sprintf("(Elastic) Failed to search: '%s', error: %s", query, err.Error()))
 		return nil, httputil.NewError(httputil.SERVER_ERROR, errorutil.InternalServerError)
 	}
 

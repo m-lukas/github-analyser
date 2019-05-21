@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/olivere/elastic/v7"
@@ -37,8 +36,6 @@ func (elasticClient *ElasticClient) Search(term string, index string, fields ...
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println(searchResult.TotalHits())
 
 	var rawData []json.RawMessage
 

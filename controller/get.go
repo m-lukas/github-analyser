@@ -3,8 +3,8 @@ package controller
 import (
 	"errors"
 	"fmt"
-	"log"
 
+	"github.com/m-lukas/github-analyser/logger"
 	"github.com/m-lukas/github-analyser/util"
 
 	"github.com/m-lukas/github-analyser/db"
@@ -23,8 +23,8 @@ func GetUser(userName string) (*db.User, error) {
 	user, err := fetchUser(userName)
 	if err != nil {
 
-		log.Println(err)
-		fmt.Println("Trying to retrieve user from cache.")
+		logger.ErrorNoMail(fmt.Sprintf("Failed to fetch data of user: %s, error %s", userName, err.Error()))
+		logger.Warn(fmt.Sprintf("Trying to get user data from cache for: %s", userName))
 		user, err = GetUserFromCache(userName, collectionName)
 		if err != nil {
 			return nil, err
@@ -45,7 +45,7 @@ func GetUser(userName string) (*db.User, error) {
 	go func(user *db.User) {
 		err = CacheUser(user, collectionName)
 		if err != nil {
-			log.Println(err)
+			logger.Error(fmt.Sprintf("Failed to cache user: %s, error: %s", user.Login, err.Error()))
 		}
 	}(user)
 
