@@ -61,23 +61,23 @@ func CalcScoreParams() error {
 		return err
 	}
 
-	logger.Info(fmt.Sprintf("%s Successfully saved user data!\n", prefix))
+	logger.Info(fmt.Sprintf("%s Successfully saved user data!", prefix))
 
 	err = db.ReinitializeScoreConfig()
 	if err != nil {
 		return err
 	}
 
-	logger.Info(fmt.Sprintf("%s Reinitialized score config!\n", prefix))
+	logger.Info(fmt.Sprintf("%s Reinitialized score config!", prefix))
 
 	err = controller.UpdateAllScores()
 	if err != nil {
 		return err
 	}
 
-	logger.Info(fmt.Sprintf("%s Finished metrix initialization!\n", prefix))
+	logger.Info(fmt.Sprintf("%s Finished metrix initialization!", prefix))
 
-	logger.Info(fmt.Sprintf("%s End time: %s\n", prefix, util.FormatDuration(time.Since(startTime))))
+	logger.Info(fmt.Sprintf("%s End time: %s", prefix, util.FormatDuration(time.Since(startTime))))
 
 	return nil
 }
