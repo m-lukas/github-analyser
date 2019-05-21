@@ -31,13 +31,13 @@ func clearMongoTestCollection(t *testing.T, collection *mongo.Collection, ctx co
 	require.Nil(t, err, "droping of collection failed")
 }
 
+//setupElasticTest initializes the elastic client and with a cleared test index
 func setupElasticTest(t *testing.T, root *db.DatabaseRoot, ctx context.Context) *db.ElasticClient {
 
 	err := root.InitElasticClient()
 	require.Nil(t, err)
 
 	elasticClient := root.ElasticClient
-
 	require.Equal(t, elasticClient.Config.Enviroment, db.ENV_TEST) //check for right db config
 
 	index := elasticClient.Config.DefaultIndex
