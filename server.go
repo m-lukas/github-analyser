@@ -12,6 +12,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/m-lukas/github-analyser/app"
 	"github.com/m-lukas/github-analyser/db"
+	"github.com/m-lukas/github-analyser/mailer"
 	"github.com/m-lukas/github-analyser/util"
 
 	"github.com/joho/godotenv"
@@ -79,6 +80,11 @@ func init() {
 }
 
 func main() {
+
+	go mailer.StartWorker()
+
+	mail := mailer.NewDefaultMail([]string{"lukas.mueller@code.berlin"}, "Test MAIL!!!!1!", "HEUREKA!")
+	mailer.Push(mail)
 
 	env := os.Getenv("ENV")
 	setupFlag := util.ReadBoolFlag("FLAG_DO_SETUP")
