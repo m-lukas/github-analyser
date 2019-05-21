@@ -6,6 +6,7 @@ const (
 	InternalServerError = "Internal server error!"
 )
 
+//ConversionError is used in http-requests with invalid param types
 type ConversionError struct {
 	Err   error
 	Param string
@@ -17,6 +18,7 @@ func (e ConversionError) Error() string {
 	return fmt.Sprintf("%s cannot use value: %s for parameter %s!", prefix, e.Value, e.Param)
 }
 
+//NullOrEmptyError is used in http-request with invalid null or empty params
 type NullOrEmptyError struct {
 	Err   error
 	Param string
