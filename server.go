@@ -81,10 +81,8 @@ func init() {
 
 func main() {
 
+	//start mail worker
 	go mailer.StartWorker()
-
-	mail := mailer.NewDefaultMail([]string{"lukas.mueller@code.berlin"}, "Test MAIL!!!!1!", "HEUREKA!")
-	mailer.Push(mail)
 
 	env := os.Getenv("ENV")
 	setupFlag := util.ReadBoolFlag("FLAG_DO_SETUP")
