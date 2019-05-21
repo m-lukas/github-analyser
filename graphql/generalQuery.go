@@ -113,6 +113,7 @@ type GeneralDataResponse struct {
 	Error error
 }
 
+//GetCommitData fetches and processes the general data of the user
 func GetGeneralData(userName string) GeneralDataResponse {
 
 	if userName == "" {
@@ -132,6 +133,7 @@ func GetGeneralData(userName string) GeneralDataResponse {
 
 }
 
+//convertGeneralData converts raw to normalised data
 func convertGeneralData(rawData *GeneralDataRaw) *GeneralData {
 
 	data := rawData.RepositoryOwner
@@ -172,13 +174,14 @@ func convertGeneralData(rawData *GeneralDataRaw) *GeneralData {
 
 }
 
+//calcStargazersAndForks loops through the nested data and gets the total count of forks and stargazers
 func calcStargazersAndForks(rawData *GeneralDataRaw, userName string) (int, int) {
 
 	var stargazersSum int
 	var forksSum int
 
 	repoCounter := 0
-	maxRepoNum := 25
+	maxRepoNum := 25 //limit repo count to reduce advantage of user with many repositories
 
 	repositorySlice := rawData.RepositoryOwner.Repositories.Edges
 
@@ -187,6 +190,7 @@ func calcStargazersAndForks(rawData *GeneralDataRaw, userName string) (int, int)
 		repoNode := repo.Node
 		owner := strings.Split(repoNode.NameWithOwner, "/")[0]
 
+		//check if user is the owner of the repository
 		if owner != userName {
 			continue
 		} else {

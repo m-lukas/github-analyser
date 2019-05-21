@@ -40,6 +40,7 @@ type CommitDataResponse struct {
 	Error error
 }
 
+//GetCommitData fetches and processes the commit data
 func GetCommitData(userName string) CommitDataResponse {
 
 	if userName == "" {
@@ -48,6 +49,7 @@ func GetCommitData(userName string) CommitDataResponse {
 
 	var rawData CommitDataRaw
 
+	//fetch data
 	err := query(userName, "./graphql/queries/commit.gql", &rawData)
 	if err != nil {
 		return CommitDataResponse{Data: nil, Error: err}
@@ -61,6 +63,7 @@ func GetCommitData(userName string) CommitDataResponse {
 
 func convertCommitData(rawData *CommitDataRaw) *CommitData {
 
+	//process and calculate commit frequenz
 	commitFrequenz := GetCommitFrequenz(rawData, time.Now())
 
 	convertedCommitData := &CommitData{
@@ -71,6 +74,7 @@ func convertCommitData(rawData *CommitDataRaw) *CommitData {
 
 }
 
+//GetCommitFrequenz loops through rawData, gets commit data and processes it
 func GetCommitFrequenz(rawCommitData *CommitDataRaw, today time.Time) float64 {
 
 	var commitDates dateSlice
@@ -89,17 +93,21 @@ func GetCommitFrequenz(rawCommitData *CommitDataRaw, today time.Time) float64 {
 		}
 	}
 
+	//return errorValue if there is no data available
 	if len(commitDates) < 1 {
 		return -1.0
 	}
 
+	//sort date slice
 	commitDates = sortDatesAsc(commitDates)
 	var maxCheckedItems int
 
+	//calculate and append time difference between the current time and most recent commit
 	recentCommitDate := commitDates[len(commitDates)-1]
 	hoursDiff := getHoursDifference(today, recentCommitDate)
 	commitTimeDifferences = append(commitTimeDifferences, hoursDiff)
 
+	//loop through slide and calculate all time differences
 	for index := len(commitDates) - 1; index > 0; index-- {
 
 		if maxCheckedItems >= 100 {
@@ -115,12 +123,14 @@ func GetCommitFrequenz(rawCommitData *CommitDataRaw, today time.Time) float64 {
 		commitTimeDifferences = append(commitTimeDifferences, hoursDiff)
 	}
 
+	//calculate average time difference
 	frequenz := util.Avg(commitTimeDifferences)
 
 	return frequenz
 
 }
 
+//getHoursDifference returns time difference between two dates in hours
 func getHoursDifference(endDate time.Time, startDate time.Time) float64 {
 	timeDiff := endDate.Sub(startDate)
 	hoursDiff := timeDiff.Hours()

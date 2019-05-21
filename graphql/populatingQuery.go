@@ -55,6 +55,7 @@ type PopulatingDataRaw struct {
 	}
 }
 
+//GetPopulatingData gets a list of followers and following users by a rootUser login
 func GetPopulatingData(rootUser string) ([]string, error) {
 
 	if rootUser == "" {
@@ -74,6 +75,7 @@ func GetPopulatingData(rootUser string) ([]string, error) {
 
 }
 
+//GetLoginList processes rawData and returns a list of unique login strings
 func GetLoginList(rawData *PopulatingDataRaw) []string {
 
 	var loginList []string
@@ -83,6 +85,7 @@ func GetLoginList(rawData *PopulatingDataRaw) []string {
 	topFollowingSlice := repositoryOwner.Following.Edges
 	topFollowersSlice := repositoryOwner.Followers.Edges
 
+	//loop through top-level following users
 	for _, edge := range topFollowingSlice {
 
 		user := edge.Node
@@ -112,6 +115,7 @@ func GetLoginList(rawData *PopulatingDataRaw) []string {
 		}
 	}
 
+	//loop through top-level followers
 	for _, edge := range topFollowersSlice {
 
 		user := edge.Node
@@ -141,6 +145,7 @@ func GetLoginList(rawData *PopulatingDataRaw) []string {
 		}
 	}
 
+	//loop through list and remove duplicates
 	uniqueList := util.RemoveDuplicates(loginList)
 
 	return uniqueList

@@ -5,8 +5,9 @@ import (
 	"time"
 )
 
-type dateSlice []time.Time
+type dateSlice []time.Time //custom time slice
 
+//sorting helper functions
 func (slice dateSlice) Less(i, j int) bool {
 	return slice[i].Before(slice[j])
 }
@@ -20,6 +21,5 @@ func (slice dateSlice) Len() int {
 func sortDatesAsc(slice dateSlice) dateSlice {
 
 	sort.Sort(slice)
-
 	return slice
 }
