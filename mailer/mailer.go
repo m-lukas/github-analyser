@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+//Mail struct for building mails
 type Mail struct {
 	Sender   string
 	Auth     smtp.Auth
@@ -14,6 +15,7 @@ type Mail struct {
 	Body     string
 }
 
+//DefaultSender returns the configurated mail sender
 func DefaultSender() string {
 	sender := os.Getenv("MAILER_USER_MAIL")
 	if sender != "" {
@@ -24,10 +26,12 @@ func DefaultSender() string {
 	return sender
 }
 
+//DefaultAuth returns the smtp auth using the configurated information
 func DefaultAuth() smtp.Auth {
 	return smtp.PlainAuth("", os.Getenv("MAILER_USER_MAIL"), os.Getenv("MAILER_USER_PASS"), os.Getenv("MAILER_SMTP_AUTH"))
 }
 
+//NewDefaultMail returns a mail object with the default sender and default auth
 func NewDefaultMail(receiver []string, subject string, body string) *Mail {
 	mail := &Mail{}
 	mail.Sender = DefaultSender()
@@ -38,6 +42,7 @@ func NewDefaultMail(receiver []string, subject string, body string) *Mail {
 	return mail
 }
 
+//NewMail returns a fully configurateable mail object
 func NewMail(sender string, auth smtp.Auth, receiver []string, subject string, body string) *Mail {
 	mail := &Mail{}
 	mail.Sender = sender
@@ -48,6 +53,7 @@ func NewMail(sender string, auth smtp.Auth, receiver []string, subject string, b
 	return mail
 }
 
+//Send sends the mail object using smtp
 func Send(mail *Mail) error {
 
 	server := os.Getenv("MAILER_SMTP_SEND")
