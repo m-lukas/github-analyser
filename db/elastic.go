@@ -2,13 +2,13 @@ package db
 
 import (
 	"context"
-	"log"
 	"os"
 	"time"
 
 	"github.com/m-lukas/github-analyser/logger"
 	"github.com/m-lukas/github-analyser/util"
 	"github.com/olivere/elastic/v7"
+	"github.com/pkg/errors"
 )
 
 //ElasticClient contains the elastic db client, its config and the default database
@@ -67,21 +67,21 @@ func (root *DatabaseRoot) InitElasticClient() error {
 		elastic.SetURL(config.ElasticURI),
 		elastic.SetSniff(config.SniffOpt),
 		elastic.SetHealthcheckInterval(config.HealthCheckInterval),
-		elastic.SetErrorLog(log.New(os.Stderr, "[ELASTIC-ERROR] ", log.LstdFlags)),
+		//elastic.SetErrorLog(log.New(os.Stderr, "[ELASTIC-ERROR] ", log.LstdFlags)),
 		//elastic.SetInfoLog(log.New(os.Stdout, "", log.LstdFlags)),
 	)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "elastic")
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	//ping client
 	_, _, err = client.Ping(config.ElasticURI).Do(ctx)
 	if err != nil {
 		//not reachable
-		return err
+		return errors.Wrap(err, "elastic")
 	}
 
 	elasticClient.Client = client

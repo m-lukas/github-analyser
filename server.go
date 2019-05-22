@@ -39,8 +39,8 @@ type ServerConfig struct {
 
 func defaultServerConfig() *ServerConfig {
 	return &ServerConfig{
-		Host:    "localhost",
-		Port:    8080,
+		Host:    "",
+		Port:    80,
 		APIPath: "/api",
 	}
 }
@@ -93,7 +93,7 @@ func main() {
 
 	err := db.Init()
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	if setupFlag {

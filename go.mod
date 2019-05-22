@@ -11,6 +11,7 @@ require (
 	github.com/mattn/go-colorable v0.1.1 // indirect
 	github.com/mattn/go-isatty v0.0.7 // indirect
 	github.com/olivere/elastic/v7 v7.0.0
+	github.com/pkg/errors v0.8.1
 	github.com/rs/cors v1.6.0
 	github.com/stretchr/testify v1.3.0
 	github.com/tidwall/pretty v0.0.0-20190325153808-1166b9ac2b65 // indirect

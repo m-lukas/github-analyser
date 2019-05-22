@@ -8,6 +8,7 @@ import (
 
 	"github.com/m-lukas/github-analyser/logger"
 	"github.com/m-lukas/github-analyser/util"
+	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -57,13 +58,13 @@ func (root *DatabaseRoot) InitMongoClient() error {
 	}
 
 	//add timeout
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	//try to establish connection to mongoDB Instance
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoClient.Config.MongoURI))
 	if err != nil {
-		return err
+		return errors.Wrap(err, "mongo")
 	}
 	//ping instance, return err if not reachable
 	err = client.Ping(ctx, readpref.Primary())
