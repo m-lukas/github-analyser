@@ -27,3 +27,8 @@ services:
       - 9200:9200
     volumes:
       - .data/elastic:/data/elastic
+    
+  deployment:
+    build: .
+    ports:
+      - "80:80"
