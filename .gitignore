@@ -1,1 +1,5 @@
-.realize.yaml
+realize.yaml.example
+data/
+github-analyser
+.env
+metrix/input

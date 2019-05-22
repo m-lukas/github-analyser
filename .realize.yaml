@@ -16,22 +16,18 @@ settings:
     force: false
     interval: 0s
 server:
-  status: true
+  status: false
   open: false
   port: 5000
   host: localhost
 schema:
 - name: github-analyser
-  path: /Users/m-lukas/Documents/Projects/go/src/github.com/m-lukas/github-analyser
+  path: /Users/m-lukas/Documents/Projects/github-analyser
   commands:
-    clean:
-      status: true
-    vet:
-      status: true
     fmt:
       status: true
     test:
-      status: true
+      status: false
     generate:
       status: true
     install:

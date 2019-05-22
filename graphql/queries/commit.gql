@@ -1,0 +1,29 @@
+query COMMITFREQ($name: String!){
+  	rateLimit{
+      cost
+      remaining
+    }
+    repositoryOwner(login: $name) {
+        ... on User {
+          	repositories(first: 25, orderBy: {field: PUSHED_AT, direction: DESC}){
+            	edges{
+                node{
+                  ref(qualifiedName: "master"){
+                    target{
+                      ... on Commit{
+                        history(first: 25){
+                          edges{
+                            node{
+                              committedDate
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+          	}        	
+          }
+       }
+    }
