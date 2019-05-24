@@ -44,7 +44,7 @@ Please make sure that you have installed the latest version of Docker and Docker
 ```shell
 > docker-compose up mongo redis elasticsearch
 ```
-6. After all databases have been started properly, start the app:
+6. After all databases have been started properly, switch to a new tap and start the app:
 ```shell
 > docker-compose up deployment
 ```
@@ -55,5 +55,24 @@ For deployments on servers I recommend Google Cloud Computing Engine with the Co
 
 ## Configuration
 
-Property | Description
------------- | -------------
+Property | Mandatory | Description
+------------ | ---- | -------------
+MONGO_USER | x | The username to log into the mongodb instance.
+MONGO_PASS | x | Password used for the mongodb instance.
+MONGO_HOST | x | Host and port of the mongodb instance (form: `host:port`). In the default setup, the value is **mongo:27017**.
+MONGO_AUTH_DB | x | Authentification database of the mongodb instance. Default value: **admin**.
+MONGO_DB | x | Mongo database that is used for non-testing data. Default value: **core**.
+REDIS_HOST | x | Host and port of the redis instance (form: `host:port`). In the default setup, the value is **redis:6379**.
+REDIS_PASS |   | Password used for the authentification of the redis instance. Not used and **empty** by default.
+REDIS_DB | x | Redis database that is used for non-testing data. Default value: **0**.
+ELASTIC_HOST | x | Host and port of the elasticsearch instance (form: `http://host:port`). In the default setup, the value is: **http://elasticsearch:9200**.
+GITHUB_TOKEN | x | GitHub Access Token for the GraphQL API, can be retrieved by following this tutorial: [Github Access Token](https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line).
+MAILER_SMTP_SEND | x | Host and port of smtp server for sending mails. Example value using gmail: **smtp.gmail.com:587**.
+MAILER_SMTP_AUTH | x | Host of smtp server for sending mails. Example value using gmail: **smtp.gmail.com**.
+MAILER_USER_MAIL | x | User mail for authentification on the smtp server and as sender in mails. Example value using gmail: **(some gmail email adress)**.
+MAILER_USER_PASS | x | Passwort to the beloging user mail for authentification on the smtp server. Example value using gmail: **(gmail password)**.
+MAILER_LOG_RECEIVER | x | Email-Adress of a person who should receive important error log messages as a mail. Default value: **Your mail adress**.
+BACKEND_URL |   | Host and port of the deployment (mainly used for logs). Default value: **localhost:80**.
+ENV |   | Enviroment of the application. Possible values: **"dev" or "prod"**.
+FLAG_DO_SETUP |   | Flag to start the setup on running the server. Possible values: **0 (false/default) or 1 (true)**.
+FLAG_DO_METRIX |   | Flag to start the metrix initialization on running the server. Possible values: **0 (false/default) or 1 (true)**.
