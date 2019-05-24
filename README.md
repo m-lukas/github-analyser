@@ -76,3 +76,13 @@ BACKEND_URL |   | Host and port of the deployment (mainly used for logs). Defaul
 ENV |   | Enviroment of the application. Possible values: **"dev" or "prod"**.
 FLAG_DO_SETUP |   | Flag to start the setup on running the server. Possible values: **0 (false/default) or 1 (true)**.
 FLAG_DO_METRIX |   | Flag to start the metrix initialization on running the server. Possible values: **0 (false/default) or 1 (true)**.
+
+## Routes
+Path (**Basepath: /api**) | Description
+------------ | -------------
+/user/<username> | Get all information about a specific user.
+/user/<username>/score | Get ActivityScore and PopularityScore of a user.
+/score/<score (0-100)> | Get the user with the nearest ActivityScore to the provided value.
+/score/<score (0-100)>/next/<entities> | Gets the next n users by ActivityScore ascending.
+/score/<score (0-100)>/previous/<entities> | Gets the previous n users by ActivityScore descending.
+/search?search=<query> | Searches name, username, email and login of all users for the provided search query.
