@@ -41,8 +41,9 @@ func (client *MongoClient) getDefaultConfig() *MongoConfig {
 func (client *MongoClient) getTestConfig() *MongoConfig {
 	return &MongoConfig{
 		MongoDatabaseName: "core_test",
-		MongoURI:          "mongodb://user:hd63gdf5df5g@localhost:27018/admin",
-		Enviroment:        ENV_TEST,
+		// MongoURI:          "mongodb://user:hd63gdf5df5g@localhost:27018/admin",
+		MongoURI:   "mongodb://localhost:27018/admin",
+		Enviroment: ENV_TEST,
 	}
 }
 
@@ -88,8 +89,9 @@ func (root *DatabaseRoot) InitMongoClient() error {
 func getMongoURI() (uri string) {
 	dbHost := os.Getenv("MONGO_HOST")
 	dbName := os.Getenv("MONGO_NAME")
-	dbUser := os.Getenv("MONGO_USER")
-	dbPass := os.Getenv("MONGO_PASS")
+	// dbUser := os.Getenv("MONGO_USER")
+	// dbPass := os.Getenv("MONGO_PASS")
 
-	return fmt.Sprintf(`mongodb://%s:%s@%s/%s`, dbUser, dbPass, dbHost, dbName)
+	// return fmt.Sprintf(`mongodb://%s:%s@%s/%s`, dbUser, dbPass, dbHost, dbName)
+	return fmt.Sprintf(`mongodb://%s/%s`, dbHost, dbName)
 }

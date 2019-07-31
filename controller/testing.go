@@ -35,7 +35,7 @@ func clearMongoTestCollection(t *testing.T, collection *mongo.Collection, ctx co
 func setupElasticTest(t *testing.T, root *db.DatabaseRoot, ctx context.Context) *db.ElasticClient {
 
 	err := root.InitElasticClient()
-	require.Nil(t, err)
+	require.Nil(t, err, "init elastic client failed")
 
 	elasticClient := root.ElasticClient
 
@@ -43,7 +43,7 @@ func setupElasticTest(t *testing.T, root *db.DatabaseRoot, ctx context.Context) 
 
 	index := elasticClient.Config.DefaultIndex
 
-	_, err = elasticClient.Client.DeleteIndex(index).Do(ctx)
+	err = elasticClient.DeleteIndex(index)
 	require.Nil(t, err, "index deletion failed")
 
 	err = elasticClient.CheckIndexes()

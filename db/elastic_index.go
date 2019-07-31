@@ -48,6 +48,33 @@ func (elasticClient *ElasticClient) CheckIndexes() error {
 
 }
 
+func (elasticClient *ElasticClient) DeleteIndex(name string) error {
+
+	client := elasticClient.Client
+
+	ctx := context.Background()
+
+	exists, err := client.IndexExists(name).Do(ctx)
+	if err != nil {
+		return err
+	}
+
+	if exists {
+
+		deleteIndex, err := elasticClient.Client.DeleteIndex(name).Do(ctx)
+		if err != nil {
+			return err
+		}
+		if !deleteIndex.Acknowledged {
+			return errors.New(fmt.Sprintf("index deletion failed for: %s", name))
+		}
+
+	}
+
+	return nil
+
+}
+
 const userMapping = `
 {
 	"mappings":{
